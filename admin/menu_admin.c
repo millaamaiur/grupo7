@@ -35,6 +35,9 @@ void menu_admin(void)
         case 3:
             menu_cancelacion_reservas();
             break;
+        case 4:
+            printf("Saliendo del menu de administrador\n");
+            break;
         default:
             printf("Opcion no valida\n");
             break;
