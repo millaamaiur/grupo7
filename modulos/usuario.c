@@ -9,7 +9,7 @@ LoginResult login(char* user, char* password){
         return LOGIN_SOCIO;
     }
     else{
-        return LOGIN_ERROR
+        return LOGIN_ERROR;
     }
 
 
