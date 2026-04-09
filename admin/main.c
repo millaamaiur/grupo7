@@ -1,17 +1,16 @@
 #include <stdio.h>
-#include "menu.h"
-int main(void){
+#include "menu_admin.h"
 
-  
-    ejecutarMenu();
-   
-   
+int main(void)
+{
 
+    printf("=====================================\n");
+    printf("   SISTEMA DE GESTION DEPORTIVA\n");
+    printf("=====================================\n");
 
     /*He hecho esto como prueba pero mas adelante habrá que hacer dependiendo de
     si la persona que hace login es admin o cliente mostrarle otro menu distinto*/
-  /*
-  char usuario[50];
+    char usuario[50];
     char password[50];
 
     printf("Usuario: ");
@@ -23,10 +22,8 @@ int main(void){
     printf("\nHas introducido:\n");
     printf("Usuario: %s\n", usuario);
     printf("Password: %s\n", password);
-  
-  
-  */  
 
+    menu_admin();
 
     return 0;
 }
