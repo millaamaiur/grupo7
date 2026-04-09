@@ -1,13 +1,15 @@
 #ifndef USUARIO_H_
 #define USUARIO_H_
 
-
-typedef enum{
+typedef enum
+{
     LOGIN_ERROR,
     LOGIN_ADMIN,
     LOGIN_SOCIO
 } LoginResult;
 
-LoginResult login(char* user, char* password);
+LoginResult login(char *user, char *password);
+
+void menu_usuarios(void);
 
 #endif
