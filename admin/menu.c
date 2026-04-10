@@ -74,7 +74,7 @@ void ejecutarMenu(void) {
                 printf("\n--- CREAR CUENTA ---\n");
                 printf("Usuario: ");
                 scanf("%s", nombre);
-                printf("Contraseña: ");
+                printf("Contrasena: ");
                 scanf("%s", password);
                 
                 int resultado = crearCuenta(nombre, password);
