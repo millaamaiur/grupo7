@@ -1,19 +1,20 @@
 #include <stdio.h>
 #include "reserva.h"
 
-void menu_cancelacion_reservas(void)
+
+void menu_cancelacion_reservas(int id_socio_actual, int es_admin)
 {
     int opcion;
 
     do
     {
-        printf("\n--- CANCELACION DE RESERVAS ---\n");
-        printf("1. Cancelar reserva por mantenimiento\n");
+        printf("\n--- GESTION DE RESERVAS ---\n");
+        printf("1. Cancelar reserva\n");
         printf("2. Consultar reservas activas\n");
-        printf("3, Consultar reservas por usuarios\n");
+        printf("3. Consultar mis reservas\n");  
         printf("4. Consultar reservas por instalacion\n");
         printf("5. Volver\n");
-        printf("Selecciona una opcion: ");
+        printf("Seleccione una opcion: ");
         scanf("%d", &opcion);
 
         int c;
@@ -22,43 +23,47 @@ void menu_cancelacion_reservas(void)
         switch (opcion)
         {
         case 1:
-            cancelar_reserva_mantenimiento();
+            // Cancelar reserva
+            {
+                int id_reserva;
+                printf("ID de la reserva a cancelar: ");
+                scanf("%d", &id_reserva);
+                cancelar_reserva(id_reserva, id_socio_actual);
+            }
             break;
+            
         case 2:
-            consultar_reservas_activas();
+            // Consultar reservas activas (solo admin puede ver todas)
+            if (es_admin) {
+                listar_reservas_activas();
+            } else {
+                printf("Solo el administrador puede ver todas las reservas\n");
+            }
             break;
+            
         case 3:
-            consultar_reservas_usuario();
+            // Consultar mis reservas
+            listar_reservas_por_socio(id_socio_actual);
             break;
+            
         case 4:
-            consultar_reservas_instalacion();
+            // Consultar reservas por instalacion
+            {
+                int id_instalacion;
+                printf("ID de la instalacion: ");
+                scanf("%d", &id_instalacion);
+                listar_reservas_por_instalacion(id_instalacion);
+            }
             break;
+            
         case 5:
-            printf("Volviendo\n");
+            printf("Volviendo al menu principal\n");
             break;
+            
         default:
             printf("Opcion no valida\n");
             break;
         }
 
     } while (opcion != 5);
-}
-
-void cancelar_reserva_mantenimiento(void)
-{
-    printf("Cancelando reserva\n");
-}
-
-void consultar_reservas_activas(void)
-{
-    printf("Consultando reservas activas\n");
-}
-
-void consultar_reservas_usuario(void)
-{
-    printf("Consultando reservas de usuario\n");
-}
-void consultar_reservas_instalacion(void)
-{
-    printf("Consultando reservas de instalaciones\n");
 }
