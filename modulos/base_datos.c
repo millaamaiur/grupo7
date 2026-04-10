@@ -1,27 +1,26 @@
 #include <stdio.h>
-#include <string.h>
-#include "sqlite3.h"
+#include "base_datos.h"
 
-
-
-int main(void){
+sqlite3* db_open() {
     sqlite3 *db;
+    int result = sqlite3_open("test.sqlite", &db);
 
-    // Abrir base de datos
-	int result = sqlite3_open("test.sqlite", &db);
-	if (result != SQLITE_OK) {
-		printf("Error opening database\n");
-		return result;
-	}
-    printf("Base de datos abierta");
+    if (result != SQLITE_OK) {
+        printf("Error opening database\n");
+        return NULL;
+    }
 
-    // Cerrar base de datos
-    result = sqlite3_close(db);
+    printf("Base de datos abierta\n");
+    return db;
+}
+
+void db_close(sqlite3* db) {
+    int result = sqlite3_close(db);
+
     if (result != SQLITE_OK) {
         printf("Error closing database\n");
         printf("%s\n", sqlite3_errmsg(db));
-        return result;
+    } else {
+        printf("Database closed\n");
     }
-    printf("Database closed\n");
-        return 0;
 }
