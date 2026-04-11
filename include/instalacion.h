@@ -1,6 +1,6 @@
 #ifndef INSTALACION_H_
 #define INSTALACION_H_
-
+#include "instalacion.h"
 void menu_instalaciones(void);
 
 void ver_ocupacion_instalaciones(void);

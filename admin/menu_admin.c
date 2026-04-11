@@ -33,7 +33,7 @@ void menu_admin(void)
             menu_instalaciones();
             break;
         case 3:
-            menu_cancelacion_reservas();
+             menu_cancelacion_reservas(0, 1);
             break;
         case 4:
             printf("Saliendo del menu de administrador\n");
