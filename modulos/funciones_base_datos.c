@@ -1,5 +1,7 @@
 #include "../include/funciones_base_datos.h"
 #include <stddef.h>
+#include <stdio.h>    
+#include <string.h>
 
 LoginResult login_db(sqlite3 *db, char *user, char *password)
 {

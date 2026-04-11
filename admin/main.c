@@ -3,6 +3,8 @@
 #include "base_datos.h"
 #include "funciones_base_datos.h"
 
+extern sqlite3 *db;
+
 int main(void)
 {
 
@@ -44,7 +46,7 @@ int main(void)
         printf("\n---Se ha iniciado sesion como usuario---\n");
         break;
     case LOGIN_ERROR:
-        printf("\n---Usuario y/o contraseña incorrectas---\n");
+        printf("\n---Usuario y/o contrasena incorrectas---\n");
         break;
     default:
         printf("\n---Se ha producido un error---\n");

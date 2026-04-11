@@ -1,6 +1,6 @@
 #include "../include/usuario.h"
 #include <string.h>
-
+#include <stdio.h>
 void menu_usuarios(void)
 {
 
