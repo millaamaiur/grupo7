@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include "menu_admin.h"
 #include "base_datos.h"
-#include "funciones_base_datos.h"
-
-extern sqlite3 *db;
+#include "login.h"
 
 int main(void)
 {

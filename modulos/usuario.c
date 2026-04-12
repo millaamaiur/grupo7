@@ -32,8 +32,10 @@ void menu_usuarios(void)
             break;
         case 3:
             printf("Modificar suscripcion\n");
+            break;
         case 4:
             printf("Volviendo al menu de administrador\n");
+            break;
         default:
             printf("Opcion no valida\n");
             break;

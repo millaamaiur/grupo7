@@ -5,43 +5,8 @@
 #include "base_datos.h"
 #include <stdlib.h>
 
-extern sqlite3 *db;
 
-// ============================================================
-// CALLBACKS — definidos a nivel global, fuera de toda función
-// ============================================================
-
-static int callback_verificar(void *datos_usuario, int num_columnas, char **valores, char **nombres_columnas)
-{
-    int *contador = (int*)datos_usuario;
-    *contador = atoi(valores[0]);
-    return 0;
-}
-
-static int callback_reservas_activas(void *data, int argc, char **argv, char **azColName)
-{
-    printf("ID: %s | Socio: %s | Instalacion: %s | Fecha: %s | Hora: %s\n",
-           argv[0], argv[1], argv[2], argv[3], argv[4]);
-    return 0;
-}
-
-static int callback_reservas_socio(void *data, int argc, char **argv, char **azColName)
-{
-    printf("ID: %s | Instalacion: %s | Fecha: %s | Hora: %s\n",
-           argv[0], argv[1], argv[2], argv[3]);
-    return 0;
-}
-
-static int callback_reservas_instalacion(void *data, int argc, char **argv, char **azColName)
-{
-    printf("ID: %s | Socio: %s | Fecha: %s | Hora: %s\n",
-           argv[0], argv[1], argv[2], argv[3]);
-    return 0;
-}
-
-
-
-void menu_cancelacion_reservas(int id_socio_actual, int es_admin)
+void menu_cancelacion_reservas(sqlite3* db, int id_socio_actual, int es_admin)
 {
     int opcion;
 
@@ -57,39 +22,43 @@ void menu_cancelacion_reservas(int id_socio_actual, int es_admin)
         scanf("%d", &opcion);
 
         int c;
-        while ((c = getchar()) != '\n' && c != EOF);
+        while ((c = getchar()) != '\n' && c != EOF)
+            ;
 
         switch (opcion)
         {
         case 1:
-            {
-                int id_reserva;
-                printf("ID de la reserva a cancelar: ");
-                scanf("%d", &id_reserva);
-                cancelar_reserva(id_reserva, id_socio_actual);
-            }
-            break;
+        {
+            int id_reserva;
+            printf("ID de la reserva a cancelar: ");
+            scanf("%d", &id_reserva);
+            cancelar_reserva(db, id_reserva, id_socio_actual);
+        }
+        break;
 
         case 2:
-            if (es_admin) {
-                listar_reservas_activas();
-            } else {
+            if (es_admin)
+            {
+                listar_reservas_activas(db);
+            }
+            else
+            {
                 printf("Solo el administrador puede ver todas las reservas\n");
             }
             break;
 
         case 3:
-            listar_reservas_por_socio(id_socio_actual);
+            listar_reservas_por_socio(db, id_socio_actual);
             break;
 
         case 4:
-            {
-                int id_instalacion;
-                printf("ID de la instalacion: ");
-                scanf("%d", &id_instalacion);
-                listar_reservas_por_instalacion(id_instalacion);
-            }
-            break;
+        {
+            int id_instalacion;
+            printf("ID de la instalacion: ");
+            scanf("%d", &id_instalacion);
+            listar_reservas_por_instalacion(db, id_instalacion);
+        }
+        break;
 
         case 5:
             printf("Volviendo al menu principal\n");
@@ -103,117 +72,237 @@ void menu_cancelacion_reservas(int id_socio_actual, int es_admin)
     } while (opcion != 5);
 }
 
-
-
-int verificar_disponibilidad(int id_instalacion, char *fecha, char *hora)
+int verificar_disponibilidad(sqlite3 *db, int id_instalacion, char *fecha, char *hora)
 {
-    char sql[500];
-    sprintf(sql, "SELECT COUNT(*) FROM reservas "
-                 "WHERE id_instalacion = %d AND fecha = '%s' AND hora_inicio = '%s' AND estado = 'activa'",
-                 id_instalacion, fecha, hora);
+
+    sqlite3_stmt *stmt;
+
+    const char *sql = "SELECT COUNT(*) FROM reservas WHERE id_instalacion = ? AND fecha = ? AND hora_inicio = ? AND estado = 'activa'";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+    {
+        printf("Error al preparar la query\n");
+        return 0;
+    }
+    sqlite3_bind_int(stmt, 1, id_instalacion);
+    sqlite3_bind_text(stmt, 2, fecha, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, hora, -1, SQLITE_STATIC);
 
     int cantidad = 0;
-    char *error = NULL;
 
-    sqlite3_exec(db, sql, callback_verificar, &cantidad, &error);
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        cantidad = sqlite3_column_int(stmt, 0);
+        //                                  ^
+        //                            columna 0 = el COUNT(*)
+    }
 
-    return (cantidad == 0);
+    sqlite3_finalize(stmt);
+
+    return (cantidad == 0); // 1 = disponible, 0 = ocupado
 }
 
-int crear_reserva(int id_socio, int id_instalacion, char *fecha, char *hora, int duracion)
+int crear_reserva(sqlite3 *db, int id_socio, int id_instalacion, char *fecha, char *hora, int duracion)
 {
-    if (verificar_disponibilidad(id_instalacion, fecha, hora) == 0) {
+    if (verificar_disponibilidad(db, id_instalacion, fecha, hora) == 0)
+    {
         return 0;
     }
 
-    char sql[1000];
-    sprintf(sql, "INSERT INTO reservas (id_soc, id_instalacion, fecha, hora_inicio, duracion, estado, fecha_reserva) "
-                 "VALUES (%d, %d, '%s', '%s', %d, 'activa', date('now'))",
-                 id_socio, id_instalacion, fecha, hora, duracion);
+    sqlite3_stmt *stmt;
 
-    return db_execute(db, sql);
+    const char *sql = "INSERT INTO reservas (id_soc, id_instalacion, fecha, hora_inicio, duracion, estado, fecha_reserva) "
+                      "VALUES (?, ?, ?, ?, ?, 'activa', date('now'))";
+
+    // 1. Preparar la consulta
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+    {
+        printf("Error al preparar la query\n");
+        return 0;
+    }
+
+    // 2. Bind de parámetros
+    sqlite3_bind_int(stmt, 1, id_socio);
+    sqlite3_bind_int(stmt, 2, id_instalacion);
+    sqlite3_bind_text(stmt, 3, fecha, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, hora, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 5, duracion);
+
+    // 3. Ejecutar
+    int resultado = sqlite3_step(stmt);
+
+    // 4. Limpiar siempre, tanto si va bien como si no
+    sqlite3_finalize(stmt);
+
+    if (resultado == SQLITE_DONE)
+    {
+        printf("Reserva creada correctamente\n");
+        return 1;
+    }
+    else
+    {
+        printf("ERROR: No se creo la reserva\n");
+        return 0;
+    }
 }
 
-int cancelar_reserva(int id_reserva, int id_socio)
+int cancelar_reserva(sqlite3 *db, int id_reserva, int id_socio)
 {
-    char sql[500];
-    sprintf(sql, "UPDATE reservas SET estado = 'cancelada' "
-                 "WHERE id_reserva = %d AND id_soc = %d AND estado = 'activa'",
-                 id_reserva, id_socio);
+    sqlite3_stmt *stmt;
 
-    int resultado = db_execute(db, sql);
+    const char *sql = "UPDATE reservas SET estado = 'cancelada' WHERE id_reserva = ? and id_soc = ? AND estado = 'activa'";
 
-    if (resultado) {
+    // 1. Preparar la consulta
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+    {
+        printf("Error al preparar la query\n");
+        return 0;
+    }
+
+    // 2. Bind de parámetros
+    sqlite3_bind_int(stmt, 1, id_reserva);
+    sqlite3_bind_int(stmt, 2, id_socio);
+
+    // 3. Ejecutar
+    int resultado = sqlite3_step(stmt);
+
+    // 4. Limpiar siempre, tanto si va bien como si no
+    sqlite3_finalize(stmt);
+
+    if (resultado == SQLITE_DONE)
+    {
         printf("Reserva cancelada correctamente\n");
         return 1;
-    } else {
+    }
+    else
+    {
         printf("ERROR: No se encontro la reserva\n");
         return 0;
     }
 }
 
-int cancelar_reserva_admin(int id_reserva, char *motivo)
+int cancelar_reserva_admin(sqlite3 *db, int id_reserva, char *motivo)
 {
-    char sql[500];
-    sprintf(sql, "UPDATE reservas SET estado = 'cancelada', motivo_cancelacion = '%s' "
-                 "WHERE id_reserva = %d AND estado = 'activa'",
-                 motivo, id_reserva);
+    sqlite3_stmt *stmt;
 
-    int resultado = db_execute(db, sql);
+    const char *sql = "UPDATE reservas SET estado = 'cancelada', motivo_cancelacion = ? WHERE id_reserva = ? AND estado = 'activa'";
 
-    if (resultado) {
+    // 1. Preparar la consulta
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+    {
+        printf("Error al preparar la query\n");
+        return 0;
+    }
+    sqlite3_bind_text(stmt, 1, motivo, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 2, id_reserva);
+
+    // 3. Ejecutar
+    int resultado = sqlite3_step(stmt);
+
+    // 4. Limpiar siempre, tanto si va bien como si no
+    sqlite3_finalize(stmt);
+
+    if (resultado == SQLITE_DONE)
+    {
         printf("Reserva cancelada por: %s\n", motivo);
         return 1;
-    } else {
+    }
+    else
+    {
         printf("ERROR: No se encontro la reserva\n");
         return 0;
     }
 }
 
-void listar_reservas_activas(void)
+void listar_reservas_activas(sqlite3 *db)
 {
-   char sql[] = "SELECT r.id_reserva, s.user, i.nombre, r.fecha, r.hora_inicio "
-             "FROM reservas r "
-             "JOIN usuarios s ON r.id_soc = s.id "
-             "JOIN instalaciones i ON r.id_instalacion = i.id_instalacion "
-             "WHERE r.estado = 'activa'";
+    sqlite3_stmt *stmt;
+
+    const char *sql = "SELECT r.id_reserva, s.user, i.nombre, r.fecha, r.hora_inicio "
+                      "FROM reservas r "
+                      "JOIN usuarios s ON r.id_soc = s.id "
+                      "JOIN instalaciones i ON r.id_instalacion = i.id_instalacion "
+                      "WHERE r.estado = 'activa'";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("Error al preparar la query\n");
+        return;
+    }
 
     printf("\n=== RESERVAS ACTIVAS ===\n");
 
-    char *error = NULL;
-    int rc = sqlite3_exec(db, sql, callback_reservas_activas, NULL, &error);
-    if (rc != SQLITE_OK) {
-        printf("Error SQL: %s\n", error);
-        sqlite3_free(error);
-    } else {
-        printf("Consulta ejecutada OK\n");
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int id          = sqlite3_column_int(stmt, 0);
+        const char *user        = (const char *)sqlite3_column_text(stmt, 1);
+        const char *instalacion = (const char *)sqlite3_column_text(stmt, 2);
+        const char *fecha       = (const char *)sqlite3_column_text(stmt, 3);
+        const char *hora        = (const char *)sqlite3_column_text(stmt, 4);
+
+        printf("ID: %d | Socio: %s | Instalacion: %s | Fecha: %s | Hora: %s\n",
+               id, user, instalacion, fecha, hora);
     }
+
+    sqlite3_finalize(stmt);
 }
 
-void listar_reservas_por_socio(int id_socio)
+void listar_reservas_por_socio(sqlite3 *db, int id_socio)
 {
-    char sql[500];
-    sprintf(sql, "SELECT r.id_reserva, i.nombre, r.fecha, r.hora_inicio "
-                 "FROM reservas r "
-                 "JOIN instalaciones i ON r.id_instalacion = i.id_instalacion "
-                 "WHERE r.id_soc = %d AND r.estado = 'activa'", id_socio);
+    sqlite3_stmt *stmt;
+
+    const char *sql = "SELECT r.id_reserva, i.nombre, r.fecha, r.hora_inicio "
+                      "FROM reservas r "
+                      "JOIN instalaciones i ON r.id_instalacion = i.id_instalacion "
+                      "WHERE r.id_soc = ? AND r.estado = 'activa'";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("Error al preparar la query\n");
+        return;
+    }
+
+    sqlite3_bind_int(stmt, 1, id_socio);
 
     printf("\n=== MIS RESERVAS ===\n");
 
-    char *error = NULL;
-    sqlite3_exec(db, sql, callback_reservas_socio, NULL, &error);
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int id                  = sqlite3_column_int(stmt, 0);
+        const char *instalacion = (const char *)sqlite3_column_text(stmt, 1);
+        const char *fecha       = (const char *)sqlite3_column_text(stmt, 2);
+        const char *hora        = (const char *)sqlite3_column_text(stmt, 3);
+
+        printf("ID: %d | Instalacion: %s | Fecha: %s | Hora: %s\n",
+               id, instalacion, fecha, hora);
+    }
+
+    sqlite3_finalize(stmt);
 }
 
-void listar_reservas_por_instalacion(int id_instalacion)
+void listar_reservas_por_instalacion(sqlite3 *db, int id_instalacion)
 {
-    char sql[500];
-    sprintf(sql, "SELECT r.id_reserva, s.nombre, r.fecha, r.hora_inicio "
-                 "FROM reservas r "
-                 "JOIN usuarios s ON r.id_soc = s.id_soc "
-                 "WHERE r.id_instalacion = %d AND r.estado = 'activa'", id_instalacion);
+    sqlite3_stmt *stmt;
+
+    const char *sql = "SELECT r.id_reserva, s.user, r.fecha, r.hora_inicio "
+                      "FROM reservas r "
+                      "JOIN usuarios s ON r.id_soc = s.id "
+                      "WHERE r.id_instalacion = ? AND r.estado = 'activa'";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("Error al preparar la query\n");
+        return;
+    }
+
+    sqlite3_bind_int(stmt, 1, id_instalacion);
 
     printf("\n=== RESERVAS DE LA INSTALACION ===\n");
 
-    char *error = NULL;
-    sqlite3_exec(db, sql, callback_reservas_instalacion, NULL, &error);
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int id          = sqlite3_column_int(stmt, 0);
+        const char *user  = (const char *)sqlite3_column_text(stmt, 1);
+        const char *fecha = (const char *)sqlite3_column_text(stmt, 2);
+        const char *hora  = (const char *)sqlite3_column_text(stmt, 3);
+
+        printf("ID: %d | Socio: %s | Fecha: %s | Hora: %s\n",
+               id, user, fecha, hora);
+    }
+
+    sqlite3_finalize(stmt);
 }
