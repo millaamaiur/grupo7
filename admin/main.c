@@ -38,7 +38,7 @@ int main(void)
     {
     case LOGIN_ADMIN:
         printf("\n---Se ha iniciado sesion como administrador---\n");
-        menu_admin();
+        menu_admin(db);
         break;
     case LOGIN_SOCIO:
         printf("\n---Se ha iniciado sesion como usuario---\n");
