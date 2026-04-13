@@ -22,6 +22,7 @@ void menu_usuarios(sqlite3 *db)
 
         switch (opcion)
         {
+        //Alta de usuario
         case 1:
         {
             // --- Recoger y validar usuario ---
@@ -103,9 +104,71 @@ void menu_usuarios(sqlite3 *db)
             dar_alta_usuario(db, usuario, password, rol, fecha_nacimiento);
             break;
         }
+        //Baja de usuario 
         case 2:
-            printf("Baja de usuario\n");
+        {
+            char usuario[20];
+            char password[20];
+            int valido = 0;
+
+            // --- Recoger y validar usuario ---
+            while (!valido) {
+                printf("Inserte nombre de usuario a dar de baja: ");
+                if (scanf("%19s", usuario) != 1) {
+                    while (getchar() != '\n');
+                    continue;
+                }
+                while (getchar() != '\n');
+
+                if (strlen(usuario) < 3) {
+                    printf("Error: El usuario debe tener al menos 3 caracteres.\n");
+                    continue;
+                }
+
+                // --- Recoger password ---
+                printf("Inserte la contrasena del usuario: ");
+                if (scanf("%19s", password) != 1) {
+                    while (getchar() != '\n');
+                    continue;
+                }
+                while (getchar() != '\n');
+
+                // --- Comprobar si el usuario y password coinciden ---
+                sqlite3_stmt *stmt;
+                const char *sql_check = "SELECT id FROM usuarios WHERE user = ? AND password = ?";
+
+                if (sqlite3_prepare_v2(db, sql_check, -1, &stmt, NULL) != SQLITE_OK) {
+                    printf("Error al preparar la consulta.\n");
+                    continue;
+                }
+
+                sqlite3_bind_text(stmt, 1, usuario, -1, SQLITE_STATIC);
+                sqlite3_bind_text(stmt, 2, password, -1, SQLITE_STATIC);
+
+                if (sqlite3_step(stmt) != SQLITE_ROW) {
+                    printf("Error: Usuario o contrasena incorrectos.\n");
+                    sqlite3_finalize(stmt);
+                    continue;
+                }
+
+                sqlite3_finalize(stmt);
+                valido = 1;
+            }
+
+            // --- Confirmacion antes de borrar ---
+            char confirmacion;
+            printf("¿Seguro que desea dar de baja al usuario '%s'? (s/n): ", usuario);
+            scanf(" %c", &confirmacion);
+            while (getchar() != '\n');
+
+            if (confirmacion == 's' || confirmacion == 'S') {
+                dar_baja_usuario(db, usuario);
+            } else {
+                printf("Operacion cancelada.\n");
+            }
+
             break;
+        }
         case 3:
             printf("Modificar suscripcion\n");
             break;
@@ -145,5 +208,33 @@ int dar_alta_usuario(sqlite3 *db, char *user, char *password, char *rol, char *f
     } else {
         printf("ERROR: No se pudo crear el usuario\n");
         return 0;
+    }
+}
+
+int dar_baja_usuario(sqlite3 *db, char *user)
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "DELETE FROM usuarios WHERE user = ?";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("Error al preparar la query\n");
+        return 0;
+    }
+
+    sqlite3_bind_text(stmt, 1, user, -1, SQLITE_STATIC);
+    
+    int resultado = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (resultado != SQLITE_DONE) {
+        printf("ERROR: No se pudo eliminar el usuario\n");
+        return 0;
+    } 
+
+    //Comprobar si se ha borrado
+    if(sqlite3_changes(db) > 0) {
+        printf("Usuario eliminado correctamente\n");
+    } else { 
+        printf("No se encontro el usuario para eliminar\n");
     }
 }
