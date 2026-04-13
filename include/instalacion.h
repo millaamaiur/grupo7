@@ -1,9 +1,11 @@
 #ifndef INSTALACION_H_
 #define INSTALACION_H_
 #include "instalacion.h"
-void menu_instalaciones(void);
+#include <sqlite3.h>
 
-void ver_ocupacion_instalaciones(void);
+void menu_instalaciones(sqlite3 *db);
+
+void ver_ocupacion_instalaciones(sqlite3 *db);
 void alta_instalacion(void);
 void baja_instalacion(void);
 void modificar_instalacion(void);
