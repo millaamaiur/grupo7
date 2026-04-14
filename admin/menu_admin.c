@@ -27,10 +27,10 @@ void menu_admin(sqlite3 *db)
         switch (opcion)
         {
         case 1:
-            menu_usuarios();
+            menu_usuarios(db);
             break;
         case 2:
-            menu_instalaciones();
+            menu_instalaciones(db);
             break;
         case 3:
             menu_cancelacion_reservas(db ,0, 1);

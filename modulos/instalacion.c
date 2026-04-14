@@ -26,7 +26,8 @@ void menu_instalaciones(sqlite3 *db)
         scanf("%d", &opcion);
 
         int c;
-        while ((c = getchar()) != '\n' && c != EOF);
+        while ((c = getchar()) != '\n' && c != EOF)
+            ;
 
         switch (opcion)
         {
@@ -34,6 +35,7 @@ void menu_instalaciones(sqlite3 *db)
             ver_ocupacion_instalaciones(db);
             break;
         case 2:
+        {
             char nombre[100];
             char tipo[50];
             int aforo_maximo;
@@ -57,23 +59,26 @@ void menu_instalaciones(sqlite3 *db)
 
             alta_instalacion(db, nombre, tipo, aforo_maximo, precio_hora, estado);
             break;
+        }
 
         case 3:
+        {
             int id_instalacion;
             printf("Id de la instalacion a dar de baja: ");
             scanf("%d", &id_instalacion);
 
-
             baja_instalacion(db, id_instalacion);
             break;
+        }
         case 4:
+        {
             int id_instalacion;
             char nombre[100];
             char tipo[50];
             int aforo_maximo;
             double precio_hora;
             char estado[20];
-            
+
             printf("Id de la instalación: ");
             scanf("%d", &id_instalacion);
 
@@ -94,12 +99,15 @@ void menu_instalaciones(sqlite3 *db)
 
             modificar_instalacion(db, id_instalacion, nombre, tipo, aforo_maximo, precio_hora, estado);
             break;
+        }
         case 5:
+        {
             int id_instalacion;
             printf("Id de la instalacion a bloquear: ");
             scanf("%d", &id_instalacion);
             bloquear_mantenimiento(db, id_instalacion);
             break;
+        }
         case 6:
             consultar_instalaciones(db);
             break;
@@ -118,20 +126,21 @@ void ver_ocupacion_instalaciones(sqlite3 *db)
 {
     sqlite3_stmt *stmt;
 
-    const char *sql =  "SELECT i.nombre, COUNT(r.id) AS ocupacion "
-        "FROM instalaciones i "
-        "LEFT JOIN reservas r ON i.id = r.instalacion_id "
-        "GROUP BY i.id;";
+    const char *sql = "SELECT i.nombre, COUNT(r.id) AS ocupacion "
+                      "FROM instalaciones i "
+                      "LEFT JOIN reservas r ON i.id = r.instalacion_id "
+                      "GROUP BY i.id;";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
     {
         printf("Error al preparar la query\n");
-        return 0;
+        return;
     }
 
     printf("\n--- OCUPACION DE INSTALACIONES ---\n");
 
-    while(sqlite3_step(stmt) == SQLITE_ROW){
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
         const unsigned char *nombre = sqlite3_column_text(stmt, 0);
         int ocupacion = sqlite3_column_int(stmt, 1);
 
@@ -141,7 +150,7 @@ void ver_ocupacion_instalaciones(sqlite3 *db)
     sqlite3_finalize(stmt);
 }
 
-int alta_instalacion(sqlite3 *db, char* nombre, char* tipo, int aforo_maximo, double precio_hora, char* estado)
+int alta_instalacion(sqlite3 *db, char *nombre, char *tipo, int aforo_maximo, double precio_hora, char *estado)
 {
     sqlite3_stmt *stmt;
 
@@ -164,14 +173,16 @@ int alta_instalacion(sqlite3 *db, char* nombre, char* tipo, int aforo_maximo, do
     int resultado = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    if (resultado == SQLITE_DONE) {
+    if (resultado == SQLITE_DONE)
+    {
         printf("Instalación creada correctamente\n");
         return 1;
-    } else {
+    }
+    else
+    {
         printf("ERROR: No se pudo crear la instalación\n");
         return 0;
     }
-
 }
 
 int baja_instalacion(sqlite3 *db, int id_instalacion)
@@ -192,20 +203,23 @@ int baja_instalacion(sqlite3 *db, int id_instalacion)
     int resultado = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    if (resultado == SQLITE_DONE) {
+    if (resultado == SQLITE_DONE)
+    {
         printf("Instalación desactivada correctamente\n");
         return 1;
-    } else {
+    }
+    else
+    {
         printf("ERROR: No se pudo desactivar la instalación\n");
         return 0;
     }
 }
 
-int modificar_instalacion(sqlite3 *db, int id_instalacion, char* nombre, char* tipo, int aforo_maximo, double precio_hora, char* estado)
+int modificar_instalacion(sqlite3 *db, int id_instalacion, char *nombre, char *tipo, int aforo_maximo, double precio_hora, char *estado)
 {
-    sqlite3 *stmt;
+    sqlite3_stmt *stmt;
 
-    const char sql = "UPDATE instalaciones SET nombre = ?, tipo = ?, aforo_maximo = ?, precio_hora = ?, estado = ? WHERE id_instalacion = ?";
+    const char *sql = "UPDATE instalaciones SET nombre = ?, tipo = ?, aforo_maximo = ?, precio_hora = ?, estado = ? WHERE id_instalacion = ?";
 
     // 1. Preparar la consulta
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
@@ -225,10 +239,13 @@ int modificar_instalacion(sqlite3 *db, int id_instalacion, char* nombre, char* t
     int resultado = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    if (resultado == SQLITE_DONE) {
+    if (resultado == SQLITE_DONE)
+    {
         printf("Instalación modificada correctamente\n");
         return 1;
-    } else {
+    }
+    else
+    {
         printf("ERROR: No se pudo modificar la instalación\n");
         return 0;
     }
@@ -253,7 +270,8 @@ int bloquear_mantenimiento(sqlite3 *db, int id_instalacion)
 
     if (resultado == SQLITE_DONE)
     {
-        if (sqlite3_changes(db) == 0) {
+        if (sqlite3_changes(db) == 0)
+        {
             printf("No existe ninguna instalación con ese ID\n");
             return 0;
         }
