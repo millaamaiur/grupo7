@@ -59,7 +59,12 @@ void menu_instalaciones(sqlite3 *db)
             break;
 
         case 3:
-            baja_instalacion();
+            int id_instalacion;
+            printf("Id de la instalacion a dar de baja: ");
+            scanf("%d", id_instalacion);
+
+
+            baja_instalacion(db, id_instalacion);
             break;
         case 4:
             modificar_instalacion();
@@ -108,7 +113,7 @@ void ver_ocupacion_instalaciones(sqlite3 *db)
     sqlite3_finalize(stmt);
 }
 
-void alta_instalacion(sqlite3 *db, char* nombre, char* tipo, int aforo_maximo, double precio_hora, char* estado)
+int alta_instalacion(sqlite3 *db, char* nombre, char* tipo, int aforo_maximo, double precio_hora, char* estado)
 {
     sqlite3_stmt *stmt;
 
@@ -141,9 +146,31 @@ void alta_instalacion(sqlite3 *db, char* nombre, char* tipo, int aforo_maximo, d
 
 }
 
-void baja_instalacion(void)
+void baja_instalacion(sqlite3 *db, int id_instalacion)
 {
-    printf("---Baja de instalacion---\n");
+    sqlite3_stmt *stmt;
+
+    const char *sql = "UPDATE instalaciones SET estado = 'inactiva' WHERE id_instalacion = ?";
+
+    // 1. Preparar la consulta
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+    {
+        printf("Error al preparar la query\n");
+        return 0;
+    }
+
+    sqlite3_bind_int(stmt, 1, id_instalacion);
+
+    int resultado = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (resultado == SQLITE_DONE) {
+        printf("Instalación desactivada correctamente\n");
+        return 1;
+    } else {
+        printf("ERROR: No se pudo desactivar la instalación\n");
+        return 0;
+    }
 }
 
 void modificar_instalacion(void)
