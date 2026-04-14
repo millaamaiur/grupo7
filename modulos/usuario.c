@@ -234,6 +234,7 @@ int dar_baja_usuario(sqlite3 *db, char *user)
     //Comprobar si se ha borrado
     if(sqlite3_changes(db) > 0) {
         printf("Usuario eliminado correctamente\n");
+        return 1;
     } else { 
         printf("No se encontro el usuario para eliminar\n");
     }
