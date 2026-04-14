@@ -170,8 +170,85 @@ void menu_usuarios(sqlite3 *db)
             break;
         }
         case 3:
-            printf("Modificar suscripcion\n");
+        {
+            char usuario[20];
+            char password[20];
+            char fecha_nacimiento[11];
+            int valido = 0;
+            int id_usuario = -1;
+            char rol[20];
+
+            while (!valido) {
+                printf("Inserte nombre de usuario: ");
+                if (scanf("%19s", usuario) != 1) {
+                    while (getchar() != '\n');
+                    continue;
+                }
+                while (getchar() != '\n');
+
+                printf("Inserte la contrasena del usuario: ");
+                if (scanf("%19s", password) != 1) {
+                    while (getchar() != '\n');
+                    continue;
+                }
+                while (getchar() != '\n');
+
+                printf("Inserte fecha de nacimiento (YYYY-MM-DD): ");
+                if (scanf("%10s", fecha_nacimiento) != 1) {
+                    while (getchar() != '\n');
+                    continue;
+                }
+                while (getchar() != '\n');
+
+                if (strlen(fecha_nacimiento) != 10 ||
+                    fecha_nacimiento[4] != '-' || fecha_nacimiento[7] != '-') {
+                    printf("Error: Formato incorrecto. Use YYYY-MM-DD\n");
+                    continue;
+                }
+
+                //Preparar consulta
+                sqlite3_stmt *stmt;
+                //codigo de SQL
+                const char *sql_check =
+                    "SELECT id, rol FROM usuarios WHERE user = ? AND password = ? AND fecha_nac = ?";
+                //Preparar consulta
+                if (sqlite3_prepare_v2(db, sql_check, -1, &stmt, NULL) != SQLITE_OK) {
+                    printf("Error al preparar la consulta.\n");
+                    continue;
+                }
+
+                //Pasar los valores
+                sqlite3_bind_text(stmt, 1, usuario, -1, SQLITE_STATIC);
+                sqlite3_bind_text(stmt, 2, password, -1, SQLITE_STATIC);
+                sqlite3_bind_text(stmt, 3, fecha_nacimiento, -1, SQLITE_STATIC);
+
+                if (sqlite3_step(stmt) == SQLITE_ROW) {
+                    id_usuario = sqlite3_column_int(stmt, 0);
+                    strcpy(rol, (const char *)sqlite3_column_text(stmt, 1));
+                    valido = 1;
+                } else {
+                    printf("Error: Los datos introducidos no coinciden con ningun usuario.\n");
+                }
+                
+                sqlite3_finalize(stmt);
+            }
+
+            if (strcmp(rol, "admin") == 0) {
+                printf("Error: No se puede modificar la suscripcion de un administrador.\n");
+                break;
+            }
+
+            printf("\n===== SUSCRIPCIONES DISPONIBLES =====\n");
+            mostrar_suscripciones(db);
+
+            int nueva_suscripcion;
+            printf("Introduzca el id de la nueva suscripcion: ");
+            scanf("%d", &nueva_suscripcion);
+            while (getchar() != '\n');
+
+            modificar_suscripcion_usuario(db, usuario, nueva_suscripcion);
             break;
+        }
         case 4:
             printf("Volviendo al menu de administrador\n");
             break;
@@ -237,5 +314,56 @@ int dar_baja_usuario(sqlite3 *db, char *user)
         return 1;
     } else { 
         printf("No se encontro el usuario para eliminar\n");
+        return 0;
+    }
+}
+
+void mostrar_suscripciones(sqlite3 *db)
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT id_suscrip, tipo, precio FROM suscripciones";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("Error al preparar la consulta de suscripciones.\n");
+        return;
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int id = sqlite3_column_int(stmt, 0);
+        const unsigned char *tipo = sqlite3_column_text(stmt, 1);
+        double precio = sqlite3_column_double(stmt, 2);
+
+        printf("%d. %s - %.2f euros\n", id, tipo, precio);
+    }
+
+    sqlite3_finalize(stmt);
+}
+int modificar_suscripcion_usuario(sqlite3 *db, const char *user, int id_suscrip)
+{
+    sqlite3_stmt *stmt;
+    const char *sql = "UPDATE usuarios SET id_suscrip = ? WHERE user = ?";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        printf("Error al preparar la query\n");
+        return 0;
+    }
+
+    sqlite3_bind_int(stmt, 1, id_suscrip);
+    sqlite3_bind_text(stmt, 2, user, -1, SQLITE_STATIC);
+
+    int resultado = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (resultado != SQLITE_DONE) {
+        printf("ERROR: No se pudo modificar la suscripcion\n");
+        return 0;
+    }
+
+    if (sqlite3_changes(db) > 0) {
+        printf("Suscripcion modificada correctamente\n");
+        return 1;
+    } else {
+        printf("No se pudo actualizar la suscripcion\n");
+        return 0;
     }
 }
