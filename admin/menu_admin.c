@@ -18,7 +18,7 @@ void menu_admin(sqlite3 *db, int id_socio_actual)
         printf("Selecciona una opcion: ");
 
         scanf("%d", &opcion);
-
+        while (getchar() != '\n');
         switch (opcion)
         {
         case 1:

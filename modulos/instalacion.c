@@ -56,6 +56,7 @@ void menu_instalaciones(sqlite3 *db)
 
             printf("Precio por hora: ");
             scanf("%lf", &precio_hora);
+            while (getchar() != '\n');
 
             printf("Estado (activa/inactiva): ");
             fgets(estado, sizeof(estado), stdin);
@@ -208,10 +209,8 @@ int alta_instalacion(sqlite3 *db, char *nombre, char *tipo, int aforo_maximo, do
 int baja_instalacion(sqlite3 *db, int id_instalacion)
 {
     sqlite3_stmt *stmt;
-
     const char *sql = "UPDATE instalaciones SET estado = 'inactiva' WHERE id_instalacion = ?";
 
-    // 1. Preparar la consulta
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
     {
         printf("Error al preparar la query\n");
@@ -223,14 +222,21 @@ int baja_instalacion(sqlite3 *db, int id_instalacion)
     int resultado = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    if (resultado == SQLITE_DONE)
+    if (resultado != SQLITE_DONE)
+    {
+        printf("ERROR: No se pudo desactivar la instalacion\n");
+        return 0;
+    }
+
+    // Comprobar si realmente existia el ID
+    if (sqlite3_changes(db) > 0)
     {
         printf("Instalacion desactivada correctamente\n");
         return 1;
     }
     else
     {
-        printf("ERROR: No se pudo desactivar la instalacion\n");
+        printf("ERROR: No existe ninguna instalacion con ese ID\n");
         return 0;
     }
 }
