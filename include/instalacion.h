@@ -1,6 +1,5 @@
 #ifndef INSTALACION_H_
 #define INSTALACION_H_
-#include "instalacion.h"
 #include <sqlite3.h>
 
 void menu_instalaciones(sqlite3 *db);

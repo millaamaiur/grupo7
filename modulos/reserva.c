@@ -169,7 +169,7 @@ int cancelar_reserva(sqlite3 *db, int id_reserva, int id_socio)
     // 4. Limpiar siempre, tanto si va bien como si no
     sqlite3_finalize(stmt);
 
-    if (resultado == SQLITE_DONE)
+    if (sqlite3_changes(db) > 0)
     {
         printf("Reserva cancelada correctamente\n");
         return 1;

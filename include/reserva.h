@@ -1,6 +1,8 @@
 #ifndef RESERVA_H
 #define RESERVA_H
 
+#include <sqlite3.h>
+
 
 void menu_cancelacion_reservas(sqlite3* db,int id_socio_actual, int es_admin);
 
