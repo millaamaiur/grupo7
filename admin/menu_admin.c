@@ -14,7 +14,7 @@ void menu_admin(sqlite3 *db, int id_socio_actual)
         printf("1. Gestion de Usuarios\n");
         printf("2. Gestion de las instalaciones\n");
         printf("3. Cancelacion de las reservas\n");
-        printf("4. salir\n");
+        printf("4. Salir\n");
         printf("Selecciona una opcion: ");
 
         scanf("%d", &opcion);
@@ -28,7 +28,7 @@ void menu_admin(sqlite3 *db, int id_socio_actual)
             menu_instalaciones(db);
             break;
         case 3:
-            menu_cancelacion_reservas(db, id_socio_actual, 1); // ✅ CORRECTO
+            menu_cancelacion_reservas(db, id_socio_actual, 1); 
             break;
         case 4:
             printf("Saliendo del menu de administrador\n");

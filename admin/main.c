@@ -2,7 +2,13 @@
 #include "menu_admin.h"
 #include "base_datos.h"
 #include "login.h"
-
+#include "horario.h"
+#include "instalacion.h"
+#include "reserva.h"
+#include "sqlite3.h"
+#include "taquilla.h"
+#include "usuario.h"
+#include "utilidades.h"
 int main(void)
 {
     sqlite3 *db;

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "instalacion.h"
+#include <stdlib.h>
 
 void menu_instalaciones(sqlite3 *db)
 {
@@ -10,10 +11,10 @@ void menu_instalaciones(sqlite3 *db)
 
     do
     {
-        // Mostrar confirmacion
+        
         printf("Has entrado en la gestion de las instalaciones\n");
-
-        // Mostrar menu
+        
+    
         printf("\n===== MENU DE GESTION DE LAS INSTALACIONES =====\n");
         printf("1. Ver ocupacion en tiempo real\n");
         printf("2. Alta de instalacion\n");
@@ -151,17 +152,21 @@ void ver_ocupacion_instalaciones(sqlite3 *db)
         printf("Error al preparar la query: %s\n", sqlite3_errmsg(db));
         return;
     }
-
+    system("cls");
     printf("\n--- OCUPACION DE INSTALACIONES ---\n");
+
+    printf("+----------------------+-----------+\n");
+    printf("| %-20s | %-9s |\n", "Instalacion", "Ocupacion");
+    printf("+----------------------+-----------+\n");
 
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         const unsigned char *nombre = sqlite3_column_text(stmt, 0);
         int ocupacion = sqlite3_column_int(stmt, 1);
 
-        printf("Instalacion: %s | Ocupacion: %d\n", nombre, ocupacion);
+         printf("| %-20s | %-9d |\n", nombre, ocupacion);
     }
-
+    printf("+----------------------+-----------+\n");
     sqlite3_finalize(stmt);
 }
 
@@ -312,8 +317,13 @@ void consultar_instalaciones(sqlite3 *db)
         printf("Error al preparar la query\n");
         return;
     }
-
+    system("cls");
     printf("\n--- LISTADO DE INSTALACIONES ---\n");
+     printf("+------+----------------------+------------------+-------+--------+----------+\n");
+    printf("| %-4s | %-20s | %-16s | %-5s | %-6s | %-8s |\n",
+           "ID", "Nombre", "Tipo", "Aforo", "Precio", "Estado");
+    printf("+------+----------------------+------------------+-------+--------+----------+\n");
+
 
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
@@ -324,9 +334,9 @@ void consultar_instalaciones(sqlite3 *db)
         double precio = sqlite3_column_double(stmt, 4);
         const unsigned char *estado = sqlite3_column_text(stmt, 5);
 
-        printf("ID: %d | %s | Tipo: %s | Aforo: %d | Precio: %.2f | Estado: %s\n",
+ printf("| %-4d | %-20s | %-16s | %-5d | %-6.2f | %-8s |\n",
                id, nombre, tipo, aforo, precio, estado);
     }
-
+        printf("+------+----------------------+------------------+-------+--------+----------+\n");
     sqlite3_finalize(stmt);
 }
