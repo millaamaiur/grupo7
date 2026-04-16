@@ -27,7 +27,9 @@ LoginResult login_db(sqlite3 *db, char *user, char *password)
 
         LoginResult result;
 
-        if (strcmp((const char *)rol, "admin") == 0) {
+        if (rol == NULL) {
+            result = LOGIN_ERROR;
+        } else if (strcmp((const char *)rol, "admin") == 0) {
             result = LOGIN_ADMIN;
         } 
         else if (strcmp((const char *)rol, "socio") == 0) {

@@ -1,14 +1,12 @@
 #include <stdio.h>
 #include "base_datos.h"
 
-
-sqlite3 *db = NULL;
-
 sqlite3* db_open() {
+    sqlite3 *db = NULL;
     int result = sqlite3_open("database/database.db", &db);
 
     if (result != SQLITE_OK) {
-        printf("Error opening database\n");
+        printf("Error al abrir la base de datos\n");
         return NULL;
     }
 
@@ -20,10 +18,10 @@ void db_close(sqlite3* db) {
     int result = sqlite3_close(db);
 
     if (result != SQLITE_OK) {
-        printf("Error closing database\n");
+        printf("Error al cerrar la base de datos\n");
         printf("%s\n", sqlite3_errmsg(db));
     } else {
-        printf("Database closed\n");
+        printf("Base de datos cerrada\n");
     }
 }
 

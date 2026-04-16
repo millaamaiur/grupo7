@@ -43,6 +43,5 @@ void menu_admin(sqlite3 *db)
             break;
         }
 
-        /* code */
     } while (opcion != 4);
 }
