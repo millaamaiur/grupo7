@@ -4,15 +4,12 @@
 #include "instalacion.h"
 #include "reserva.h"
 
-void menu_admin(sqlite3 *db)
-
+void menu_admin(sqlite3 *db, int id_socio_actual)
 {
-    // Variable de opcion
     int opcion;
 
     do
     {
-        // Menu del admin
         printf("\n===== MENU ADMINISTRADOR =====\n");
         printf("1. Gestion de Usuarios\n");
         printf("2. Gestion de las instalaciones\n");
@@ -20,10 +17,8 @@ void menu_admin(sqlite3 *db)
         printf("4. salir\n");
         printf("Selecciona una opcion: ");
 
-        // guardar la opcion
         scanf("%d", &opcion);
 
-        // Redirigir segun la opcion
         switch (opcion)
         {
         case 1:
@@ -33,7 +28,7 @@ void menu_admin(sqlite3 *db)
             menu_instalaciones(db);
             break;
         case 3:
-            menu_cancelacion_reservas(db ,0, 1);
+            menu_cancelacion_reservas(db, id_socio_actual, 1); // ✅ CORRECTO
             break;
         case 4:
             printf("Saliendo del menu de administrador\n");

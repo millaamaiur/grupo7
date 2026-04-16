@@ -30,12 +30,29 @@ void menu_cancelacion_reservas(sqlite3* db, int id_socio_actual, int es_admin)
         case 1:
         {
             int id_reserva;
-            printf("ID de la reserva a cancelar: ");
-            scanf("%d", &id_reserva);
-            cancelar_reserva(db, id_reserva, id_socio_actual);
-        }
-        break;
+            char buffer[50];
 
+            printf("ID de la reserva a cancelar: ");
+            fgets(buffer, sizeof(buffer), stdin);
+            id_reserva = atoi(buffer);
+
+            if (es_admin)
+            {
+                char motivo[100];
+
+                printf("Motivo de la cancelacion: ");
+                fgets(motivo, sizeof(motivo), stdin);
+                motivo[strcspn(motivo, "\n")] = 0;
+
+                cancelar_reserva_admin(db, id_reserva, motivo);
+            }
+            else
+            {
+                cancelar_reserva(db, id_reserva, id_socio_actual);
+            }
+
+            break;
+        }
         case 2:
             if (es_admin)
             {
@@ -247,8 +264,29 @@ void listar_reservas_activas(sqlite3 *db)
 
 void listar_reservas_por_socio(sqlite3 *db, int id_socio)
 {
-    sqlite3_stmt *stmt;
+    // Comprobar el rol del usuario
+    sqlite3_stmt *stmt_rol;
+    const char *sql_rol = "SELECT rol FROM usuarios WHERE id = ?";
 
+    if (sqlite3_prepare_v2(db, sql_rol, -1, &stmt_rol, NULL) != SQLITE_OK) {
+        printf("Error al preparar la query\n");
+        return;
+    }
+
+    sqlite3_bind_int(stmt_rol, 1, id_socio);
+
+    if (sqlite3_step(stmt_rol) == SQLITE_ROW) {
+        const char *rol = (const char *)sqlite3_column_text(stmt_rol, 0);
+        if (strcmp(rol, "admin") == 0) {
+            printf("Un administrador no puede tener reservas activas\n");
+            sqlite3_finalize(stmt_rol);
+            return;
+        }
+    }
+    sqlite3_finalize(stmt_rol);
+
+    // Consultar reservas del socio
+    sqlite3_stmt *stmt;
     const char *sql = "SELECT r.id_reserva, i.nombre, r.fecha, r.hora_inicio "
                       "FROM reservas r "
                       "JOIN instalaciones i ON r.id_instalacion = i.id_instalacion "

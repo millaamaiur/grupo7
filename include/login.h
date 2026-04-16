@@ -10,5 +10,5 @@ typedef enum
     LOGIN_SOCIO
 } LoginResult;
 
-LoginResult login_db(sqlite3 *db, char *user, char *password);
+LoginResult login_db(sqlite3 *db, char *user, char *password, int *id_usuario);
 #endif

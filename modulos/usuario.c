@@ -324,7 +324,7 @@ void mostrar_suscripciones(sqlite3 *db)
     const char *sql = "SELECT id_suscrip, tipo, precio FROM suscripciones";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("Error al preparar la consulta de suscripciones.\n");
+        printf("Error al preparar la consulta de suscripciones: %s\n", sqlite3_errmsg(db));
         return;
     }
 
@@ -340,6 +340,25 @@ void mostrar_suscripciones(sqlite3 *db)
 }
 int modificar_suscripcion_usuario(sqlite3 *db, const char *user, int id_suscrip)
 {
+    // Verificar que la suscripcion existe
+    sqlite3_stmt *stmt_check;
+    const char *sql_check = "SELECT id_suscrip FROM suscripciones WHERE id_suscrip = ?";
+
+    if (sqlite3_prepare_v2(db, sql_check, -1, &stmt_check, NULL) != SQLITE_OK) {
+        printf("Error al preparar la query\n");
+        return 0;
+    }
+
+    sqlite3_bind_int(stmt_check, 1, id_suscrip);
+
+    if (sqlite3_step(stmt_check) != SQLITE_ROW) {
+        printf("ERROR: La suscripcion con ID %d no existe\n", id_suscrip);
+        sqlite3_finalize(stmt_check);
+        return 0;
+    }
+    sqlite3_finalize(stmt_check);
+
+    // Hacer el UPDATE
     sqlite3_stmt *stmt;
     const char *sql = "UPDATE usuarios SET id_suscrip = ? WHERE user = ?";
 
@@ -363,7 +382,7 @@ int modificar_suscripcion_usuario(sqlite3 *db, const char *user, int id_suscrip)
         printf("Suscripcion modificada correctamente\n");
         return 1;
     } else {
-        printf("No se pudo actualizar la suscripcion\n");
+        printf("No se encontro el usuario para actualizar\n");
         return 0;
     }
 }

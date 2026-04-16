@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "instalacion.h"
 
 void menu_instalaciones(sqlite3 *db)
@@ -20,7 +21,7 @@ void menu_instalaciones(sqlite3 *db)
         printf("4. Modificar instalacion\n");
         printf("5. Bloquear instalacion por mantenimiento\n");
         printf("6. Consultar instalacion\n");
-        printf("7. Salir\n");
+        printf("7. Volver\n");
         printf("Seleccione una opcion: ");
         scanf("%d", &opcion);
 
@@ -42,10 +43,12 @@ void menu_instalaciones(sqlite3 *db)
             char estado[20];
 
             printf("Nombre de la instalacion: ");
-            scanf("%99s", nombre);
+            fgets(nombre, sizeof(nombre), stdin);
+            nombre[strcspn(nombre, "\n")] = 0;
 
             printf("Tipo (piscina/pista/gimnasio...): ");
-            scanf("%49s", tipo);
+            fgets(tipo, sizeof(tipo), stdin);
+            tipo[strcspn(tipo, "\n")] = 0;
 
             printf("Aforo maximo: ");
             scanf("%d", &aforo_maximo);
@@ -54,7 +57,10 @@ void menu_instalaciones(sqlite3 *db)
             scanf("%lf", &precio_hora);
 
             printf("Estado (activa/inactiva): ");
-            scanf("%19s", estado);
+            fgets(estado, sizeof(estado), stdin);
+            estado[strcspn(estado, "\n")] = 0;
+            
+
 
             alta_instalacion(db, nombre, tipo, aforo_maximo, precio_hora, estado);
             break;
@@ -78,14 +84,20 @@ void menu_instalaciones(sqlite3 *db)
             double precio_hora;
             char estado[20];
 
-            printf("Id de la instalación: ");
+            printf("Id de la instalacion: ");
             scanf("%d", &id_instalacion);
 
+            // LIMPIAR BUFFER
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
+
             printf("Nombre de la instalacion: ");
-            scanf("%99s", nombre);
+            fgets(nombre, sizeof(nombre), stdin);
+            nombre[strcspn(nombre, "\n")] = 0;
 
             printf("Tipo (piscina/pista/gimnasio...): ");
-            scanf("%49s", tipo);
+            fgets(tipo, sizeof(tipo), stdin);
+            tipo[strcspn(tipo, "\n")] = 0;
 
             printf("Aforo maximo: ");
             scanf("%d", &aforo_maximo);
@@ -93,8 +105,12 @@ void menu_instalaciones(sqlite3 *db)
             printf("Precio por hora: ");
             scanf("%lf", &precio_hora);
 
+            // limpiar buffer otra vez
+            while ((c = getchar()) != '\n' && c != EOF);
+
             printf("Estado (activa/inactiva): ");
-            scanf("%19s", estado);
+            fgets(estado, sizeof(estado), stdin);
+            estado[strcspn(estado, "\n")] = 0;
 
             modificar_instalacion(db, id_instalacion, nombre, tipo, aforo_maximo, precio_hora, estado);
             break;
@@ -174,12 +190,12 @@ int alta_instalacion(sqlite3 *db, char *nombre, char *tipo, int aforo_maximo, do
 
     if (resultado == SQLITE_DONE)
     {
-        printf("Instalación creada correctamente\n");
+        printf("Instalacion creada correctamente\n");
         return 1;
     }
     else
     {
-        printf("ERROR: No se pudo crear la instalación\n");
+        printf("ERROR: No se pudo crear la instalacion\n");
         return 0;
     }
 }
@@ -204,12 +220,12 @@ int baja_instalacion(sqlite3 *db, int id_instalacion)
 
     if (resultado == SQLITE_DONE)
     {
-        printf("Instalación desactivada correctamente\n");
+        printf("Instalacion desactivada correctamente\n");
         return 1;
     }
     else
     {
-        printf("ERROR: No se pudo desactivar la instalación\n");
+        printf("ERROR: No se pudo desactivar la instalacion\n");
         return 0;
     }
 }
@@ -240,12 +256,12 @@ int modificar_instalacion(sqlite3 *db, int id_instalacion, char *nombre, char *t
 
     if (resultado == SQLITE_DONE)
     {
-        printf("Instalación modificada correctamente\n");
+        printf("Instalacion modificada correctamente\n");
         return 1;
     }
     else
     {
-        printf("ERROR: No se pudo modificar la instalación\n");
+        printf("ERROR: No se pudo modificar la instalacion\n");
         return 0;
     }
 }
@@ -271,16 +287,16 @@ int bloquear_mantenimiento(sqlite3 *db, int id_instalacion)
     {
         if (sqlite3_changes(db) == 0)
         {
-            printf("No existe ninguna instalación con ese ID\n");
+            printf("No existe ninguna instalacion con ese ID\n");
             return 0;
         }
 
-        printf("Instalación bloqueada por mantenimiento\n");
+        printf("Instalacion bloqueada por mantenimiento\n");
         return 1;
     }
     else
     {
-        printf("ERROR: No se pudo bloquear la instalación\n");
+        printf("ERROR: No se pudo bloquear la instalacion\n");
         return 0;
     }
 }
