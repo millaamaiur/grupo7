@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdio.h>
 #include "instalacion.h"
 
 void menu_instalaciones(sqlite3 *db)
