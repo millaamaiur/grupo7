@@ -126,14 +126,14 @@ void ver_ocupacion_instalaciones(sqlite3 *db)
 {
     sqlite3_stmt *stmt;
 
-    const char *sql = "SELECT i.nombre, COUNT(r.id) AS ocupacion "
+    const char *sql = "SELECT i.nombre, COUNT(r.id_reserva) AS ocupacion "
                       "FROM instalaciones i "
-                      "LEFT JOIN reservas r ON i.id = r.instalacion_id "
-                      "GROUP BY i.id;";
+                      "LEFT JOIN reservas r ON i.id_instalacion = r.id_instalacion "
+                      "GROUP BY i.id_instalacion, i.nombre;";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
     {
-        printf("Error al preparar la query\n");
+        printf("Error al preparar la query: %s\n", sqlite3_errmsg(db));
         return;
     }
 
