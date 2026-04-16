@@ -13,8 +13,16 @@ LoginResult login_db(sqlite3 *db, char *user, char *password, int *id_usuario)
         return LOGIN_ERROR;
     }
 
-    sqlite3_bind_text(stmt, 1, user, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, password, -1, SQLITE_STATIC);
+    if (sqlite3_bind_text(stmt, 1, user, -1, SQLITE_STATIC) != SQLITE_OK) {
+        printf("Error al bindear user\n");
+        sqlite3_finalize(stmt);
+        return LOGIN_ERROR;
+    }
+    if (sqlite3_bind_text(stmt, 2, password, -1, SQLITE_STATIC) != SQLITE_OK) {
+        printf("Error al bindear password\n");
+        sqlite3_finalize(stmt);
+        return LOGIN_ERROR;
+    }
 
     
 
