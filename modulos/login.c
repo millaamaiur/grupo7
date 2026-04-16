@@ -16,10 +16,12 @@ LoginResult login_db(sqlite3 *db, char *user, char *password, int *id_usuario)
     sqlite3_bind_text(stmt, 1, user, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, password, -1, SQLITE_STATIC);
 
+    
+
     int step = sqlite3_step(stmt);
 
     if (step == SQLITE_ROW) {
-        // 🔥 GUARDAR ID
+        
         *id_usuario = sqlite3_column_int(stmt, 0);
 
         const unsigned char *rol = sqlite3_column_text(stmt, 1);
