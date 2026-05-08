@@ -127,8 +127,9 @@ void menu_usuarios(sqlite3 *db)
                 fecha_valida = 1;
             }
 
+            Usuario u = {-1, usuario, password, rol, fecha_nacimiento, NULL, 0};
             // --- Llamar a la función de BD ---
-            dar_alta_usuario(db, usuario, password, rol, fecha_nacimiento);
+            dar_alta_usuario(db, u);
             break;
         }
         //Baja de usuario 
@@ -190,6 +191,7 @@ void menu_usuarios(sqlite3 *db)
                 valido = 1;
             }
 
+            
             // --- Confirmacion antes de borrar ---
             char confirmacion;
             printf("¿Seguro que desea dar de baja al usuario '%s'? (s/n): ", usuario);
@@ -200,7 +202,8 @@ void menu_usuarios(sqlite3 *db)
             }
 
             if (confirmacion == 's' || confirmacion == 'S') {
-                dar_baja_usuario(db, usuario);
+                Usuario u = {-1, usuario, NULL, NULL, NULL, NULL, -1};
+                dar_baja_usuario(db, u);
             } else {
                 printf("Operacion cancelada.\n");
             }
@@ -318,7 +321,8 @@ void menu_usuarios(sqlite3 *db)
                 sscanf(buffer, "%d", &nueva_suscripcion);
             }
 
-            modificar_suscripcion_usuario(db, usuario, nueva_suscripcion);
+            Usuario u = {id_usuario, usuario, NULL, rol, NULL, NULL, nueva_suscripcion};
+            modificar_suscripcion_usuario(db, u);
             break;
         }
         case 4:
@@ -332,7 +336,7 @@ void menu_usuarios(sqlite3 *db)
     } while (opcion != 4);
 }
 
-int dar_alta_usuario(sqlite3 *db, char *user, char *password, char *rol, char *fecha_nac)
+int dar_alta_usuario(sqlite3 *db, Usuario u)
 {
     sqlite3_stmt *stmt;
     const char *sql = "INSERT INTO usuarios (user, password, rol, fecha_nac) "
@@ -343,22 +347,22 @@ int dar_alta_usuario(sqlite3 *db, char *user, char *password, char *rol, char *f
         return 0;
     }
 
-    if (sqlite3_bind_text(stmt, 1, user, -1, SQLITE_STATIC) != SQLITE_OK) {
+    if (sqlite3_bind_text(stmt, 1, u.user, -1, SQLITE_STATIC) != SQLITE_OK) {
         printf("Error al bindear user\n");
         sqlite3_finalize(stmt);
         return 0;
     }
-    if (sqlite3_bind_text(stmt, 2, password, -1, SQLITE_STATIC) != SQLITE_OK) {
+    if (sqlite3_bind_text(stmt, 2, u.password, -1, SQLITE_STATIC) != SQLITE_OK) {
         printf("Error al bindear password\n");
         sqlite3_finalize(stmt);
         return 0;
     }
-    if (sqlite3_bind_text(stmt, 3, rol, -1, SQLITE_STATIC) != SQLITE_OK) {
+    if (sqlite3_bind_text(stmt, 3, u.rol, -1, SQLITE_STATIC) != SQLITE_OK) {
         printf("Error al bindear rol\n");
         sqlite3_finalize(stmt);
         return 0;
     }
-    if (sqlite3_bind_text(stmt, 4, fecha_nac, -1, SQLITE_STATIC) != SQLITE_OK) {
+    if (sqlite3_bind_text(stmt, 4, u.fecha_nac, -1, SQLITE_STATIC) != SQLITE_OK) {
         printf("Error al bindear fecha_nac\n");
         sqlite3_finalize(stmt);
         return 0;
@@ -376,7 +380,7 @@ int dar_alta_usuario(sqlite3 *db, char *user, char *password, char *rol, char *f
     }
 }
 
-int dar_baja_usuario(sqlite3 *db, char *user)
+int dar_baja_usuario(sqlite3 *db, Usuario u)
 {
     sqlite3_stmt *stmt;
     const char *sql = "DELETE FROM usuarios WHERE user = ?";
@@ -386,7 +390,7 @@ int dar_baja_usuario(sqlite3 *db, char *user)
         return 0;
     }
 
-    if (sqlite3_bind_text(stmt, 1, user, -1, SQLITE_STATIC) != SQLITE_OK) {
+    if (sqlite3_bind_text(stmt, 1, u.user, -1, SQLITE_STATIC) != SQLITE_OK) {
         printf("Error al bindear user\n");
         sqlite3_finalize(stmt);
         return 0;
@@ -409,7 +413,6 @@ int dar_baja_usuario(sqlite3 *db, char *user)
         return 0;
     }
 }
-
 void mostrar_suscripciones(sqlite3 *db)
 {
     sqlite3_stmt *stmt;
@@ -430,7 +433,7 @@ void mostrar_suscripciones(sqlite3 *db)
 
     sqlite3_finalize(stmt);
 }
-int modificar_suscripcion_usuario(sqlite3 *db, const char *user, int id_suscrip)
+int modificar_suscripcion_usuario(sqlite3 *db, Usuario u)
 {
     // Verificar que la suscripcion existe
     sqlite3_stmt *stmt_check;
@@ -441,14 +444,14 @@ int modificar_suscripcion_usuario(sqlite3 *db, const char *user, int id_suscrip)
         return 0;
     }
 
-    if (sqlite3_bind_int(stmt_check, 1, id_suscrip) != SQLITE_OK) {
+    if (sqlite3_bind_int(stmt_check, 1, u.id_suscrip) != SQLITE_OK) {
         printf("Error al bindear id_suscrip\n");
         sqlite3_finalize(stmt_check);
         return 0;
     }
 
     if (sqlite3_step(stmt_check) != SQLITE_ROW) {
-        printf("ERROR: La suscripcion con ID %d no existe\n", id_suscrip);
+        printf("ERROR: La suscripcion con ID %d no existe\n", u.id_suscrip);
         sqlite3_finalize(stmt_check);
         return 0;
     }
@@ -463,12 +466,12 @@ int modificar_suscripcion_usuario(sqlite3 *db, const char *user, int id_suscrip)
         return 0;
     }
 
-    if (sqlite3_bind_int(stmt, 1, id_suscrip) != SQLITE_OK) {
+    if (sqlite3_bind_int(stmt, 1, u.id_suscrip) != SQLITE_OK) {
         printf("Error al bindear id_suscrip\n");
         sqlite3_finalize(stmt);
         return 0;
     }
-    if (sqlite3_bind_text(stmt, 2, user, -1, SQLITE_STATIC) != SQLITE_OK) {
+    if (sqlite3_bind_text(stmt, 2, u.user, -1, SQLITE_STATIC) != SQLITE_OK) {
         printf("Error al bindear user\n");
         sqlite3_finalize(stmt);
         return 0;
