@@ -3,11 +3,23 @@
 
 #include <sqlite3.h>
 
+typedef struct
+{
+    int id_reserva;
+    int id_soc;
+    int id_instalacion;
+    char* fecha;
+    char* hora_inicio;
+    int duracion;
+    char* estado;
+    char* fecha_reservar;
+    char* motivo_cancelacion;
+}  Reserva;
 
 void menu_cancelacion_reservas(sqlite3* db,int id_socio_actual, int es_admin);
 
-int verificar_disponibilidad(sqlite3 *db, int id_instalacion, char *fecha, char *hora);
-int crear_reserva(sqlite3 *db, int id_socio, int id_instalacion, char *fecha, char *hora, int duracion);
+int verificar_disponibilidad(sqlite3 *db, Reserva r);
+int crear_reserva(sqlite3 *db, Reserva r);
 int cancelar_reserva(sqlite3 *db, int id_reserva, int id_socio);
 int cancelar_reserva_admin(sqlite3 *db, int id_reserva, char *motivo);
 void listar_reservas_activas(sqlite3 *db);

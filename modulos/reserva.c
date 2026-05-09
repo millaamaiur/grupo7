@@ -92,7 +92,7 @@ void menu_cancelacion_reservas(sqlite3 *db, int id_socio_actual, int es_admin)
     } while (opcion != 5);
 }
 
-int verificar_disponibilidad(sqlite3 *db, int id_instalacion, char *fecha, char *hora)
+int verificar_disponibilidad(sqlite3 *db, Reserva r)
 {
 
     sqlite3_stmt *stmt;
@@ -104,19 +104,19 @@ int verificar_disponibilidad(sqlite3 *db, int id_instalacion, char *fecha, char 
         printf("Error al preparar la query\n");
         return 0;
     }
-    if (sqlite3_bind_int(stmt, 1, id_instalacion) != SQLITE_OK)
+    if (sqlite3_bind_int(stmt, 1, r.id_instalacion) != SQLITE_OK)
     {
         printf("Error al bindear id_instalacion\n");
         sqlite3_finalize(stmt);
         return 0;
     }
-    if (sqlite3_bind_text(stmt, 2, fecha, -1, SQLITE_STATIC) != SQLITE_OK)
+    if (sqlite3_bind_text(stmt, 2, r.fecha, -1, SQLITE_STATIC) != SQLITE_OK)
     {
         printf("Error al bindear fecha\n");
         sqlite3_finalize(stmt);
         return 0;
     }
-    if (sqlite3_bind_text(stmt, 3, hora, -1, SQLITE_STATIC) != SQLITE_OK)
+    if (sqlite3_bind_text(stmt, 3, r.hora_inicio, -1, SQLITE_STATIC) != SQLITE_OK)
     {
         printf("Error al bindear hora\n");
         sqlite3_finalize(stmt);
@@ -137,9 +137,9 @@ int verificar_disponibilidad(sqlite3 *db, int id_instalacion, char *fecha, char 
     return (cantidad == 0); // 1 = disponible, 0 = ocupado
 }
 
-int crear_reserva(sqlite3 *db, int id_socio, int id_instalacion, char *fecha, char *hora, int duracion)
+int crear_reserva(sqlite3 *db, Reserva r)
 {
-    if (verificar_disponibilidad(db, id_instalacion, fecha, hora) == 0)
+    if (verificar_disponibilidad(db, r) == 0)
     {
         return 0;
     }
@@ -157,31 +157,31 @@ int crear_reserva(sqlite3 *db, int id_socio, int id_instalacion, char *fecha, ch
     }
 
     // 2. Bind de parámetros
-    if (sqlite3_bind_int(stmt, 1, id_socio) != SQLITE_OK)
+    if (sqlite3_bind_int(stmt, 1, r.id_soc) != SQLITE_OK)
     {
         printf("Error al bindear id_socio\n");
         sqlite3_finalize(stmt);
         return 0;
     }
-    if (sqlite3_bind_int(stmt, 2, id_instalacion) != SQLITE_OK)
+    if (sqlite3_bind_int(stmt, 2, r.id_instalacion) != SQLITE_OK)
     {
         printf("Error al bindear id_instalacion\n");
         sqlite3_finalize(stmt);
         return 0;
     }
-    if (sqlite3_bind_text(stmt, 3, fecha, -1, SQLITE_STATIC) != SQLITE_OK)
+    if (sqlite3_bind_text(stmt, 3, r.fecha, -1, SQLITE_STATIC) != SQLITE_OK)
     {
         printf("Error al bindear fecha\n");
         sqlite3_finalize(stmt);
         return 0;
     }
-    if (sqlite3_bind_text(stmt, 4, hora, -1, SQLITE_STATIC) != SQLITE_OK)
+    if (sqlite3_bind_text(stmt, 4, r.hora_inicio, -1, SQLITE_STATIC) != SQLITE_OK)
     {
         printf("Error al bindear hora\n");
         sqlite3_finalize(stmt);
         return 0;
     }
-    if (sqlite3_bind_int(stmt, 5, duracion) != SQLITE_OK)
+    if (sqlite3_bind_int(stmt, 5, r.duracion) != SQLITE_OK)
     {
         printf("Error al bindear duracion\n");
         sqlite3_finalize(stmt);
