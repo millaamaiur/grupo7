@@ -63,8 +63,8 @@ void menu_instalaciones(sqlite3 *db)
             estado[strcspn(estado, "\n")] = 0;
             
 
-
-            alta_instalacion(db, nombre, tipo, aforo_maximo, precio_hora, estado);
+            Instalacion i = {-1, nombre, tipo, aforo_maximo, precio_hora, estado};
+            alta_instalacion(db, i);
             break;
         }
 
@@ -114,7 +114,8 @@ void menu_instalaciones(sqlite3 *db)
             fgets(estado, sizeof(estado), stdin);
             estado[strcspn(estado, "\n")] = 0;
 
-            modificar_instalacion(db, id_instalacion, nombre, tipo, aforo_maximo, precio_hora, estado);
+            Instalacion i = {id_instalacion, nombre, tipo, aforo_maximo, precio_hora, estado};
+            modificar_instalacion(db, i);
             break;
         }
         case 5:
@@ -171,7 +172,7 @@ void ver_ocupacion_instalaciones(sqlite3 *db)
     sqlite3_finalize(stmt);
 }
 
-int alta_instalacion(sqlite3 *db, char *nombre, char *tipo, int aforo_maximo, double precio_hora, char *estado)
+int alta_instalacion(sqlite3 *db, Instalacion i)
 {
     sqlite3_stmt *stmt;
 
@@ -185,11 +186,11 @@ int alta_instalacion(sqlite3 *db, char *nombre, char *tipo, int aforo_maximo, do
     }
 
     // 2. Bind de parámetros
-    sqlite3_bind_text(stmt, 1, nombre, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, tipo, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 3, aforo_maximo);
-    sqlite3_bind_double(stmt, 4, precio_hora);
-    sqlite3_bind_text(stmt, 5, estado, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, i.nombre, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, i.tipo, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 3, i.aforo_maximo);
+    sqlite3_bind_double(stmt, 4, i.precio_hora);
+    sqlite3_bind_text(stmt, 5, i.estado, -1, SQLITE_STATIC);
 
     int resultado = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
@@ -241,7 +242,7 @@ int baja_instalacion(sqlite3 *db, int id_instalacion)
     }
 }
 
-int modificar_instalacion(sqlite3 *db, int id_instalacion, char *nombre, char *tipo, int aforo_maximo, double precio_hora, char *estado)
+int modificar_instalacion(sqlite3 *db, Instalacion i)
 {
     sqlite3_stmt *stmt;
 
@@ -255,12 +256,12 @@ int modificar_instalacion(sqlite3 *db, int id_instalacion, char *nombre, char *t
     }
 
     // 2. Bind de parámetros
-    sqlite3_bind_text(stmt, 1, nombre, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, tipo, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 3, aforo_maximo);
-    sqlite3_bind_double(stmt, 4, precio_hora);
-    sqlite3_bind_text(stmt, 5, estado, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 6, id_instalacion);
+    sqlite3_bind_text(stmt, 1, i.nombre, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, i.tipo, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 3, i.aforo_maximo);
+    sqlite3_bind_double(stmt, 4, i.precio_hora);
+    sqlite3_bind_text(stmt, 5, i.estado, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 6, i.id_instalacion);
 
     int resultado = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
