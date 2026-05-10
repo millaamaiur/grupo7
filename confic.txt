@@ -1,0 +1,8 @@
+# --- CONFIGURACIÓN DEL SERVIDOR ---
+# Datos de admin
+ADMIN_USER = admin
+ADMIN_PASS = 1234
+
+# Datos de rutas
+DB_PATH = ./database/database.db
+LOG_PATH = 
