@@ -37,34 +37,44 @@ void menu_instalaciones(sqlite3 *db)
             break;
         case 2:
         {
-            char nombre[100];
-            char tipo[50];
+            char buffer[100];
             int aforo_maximo;
             double precio_hora;
-            char estado[20];
+            Instalacion i;
+            i.id_instalacion = -1;
 
             printf("Nombre de la instalacion: ");
-            fgets(nombre, sizeof(nombre), stdin);
-            nombre[strcspn(nombre, "\n")] = 0;
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[strcspn(buffer, "\n")] = 0;
+            i.nombre = malloc(strlen(buffer) + 1);
+            strcpy(i.nombre, buffer);
 
             printf("Tipo (piscina/pista/gimnasio...): ");
-            fgets(tipo, sizeof(tipo), stdin);
-            tipo[strcspn(tipo, "\n")] = 0;
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[strcspn(buffer, "\n")] = 0;
+            i.tipo = malloc(strlen(buffer) + 1);
+            strcpy(i.tipo, buffer);
 
             printf("Aforo maximo: ");
             scanf("%d", &aforo_maximo);
+            i.aforo_maximo = aforo_maximo;
 
             printf("Precio por hora: ");
             scanf("%lf", &precio_hora);
+            i.precio_hora = precio_hora;
             while (getchar() != '\n');
 
             printf("Estado (activa/inactiva): ");
-            fgets(estado, sizeof(estado), stdin);
-            estado[strcspn(estado, "\n")] = 0;
-            
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[strcspn(buffer, "\n")] = 0;
+            i.estado = malloc(strlen(buffer) + 1);
+            strcpy(i.estado, buffer);
 
-            Instalacion i = {-1, nombre, tipo, aforo_maximo, precio_hora, estado};
             alta_instalacion(db, i);
+
+            free(i.nombre);
+            free(i.tipo);
+            free(i.estado);
             break;
         }
 
@@ -79,43 +89,50 @@ void menu_instalaciones(sqlite3 *db)
         }
         case 4:
         {
-            int id_instalacion;
-            char nombre[100];
-            char tipo[50];
+            char buffer[100];
             int aforo_maximo;
             double precio_hora;
-            char estado[20];
+            Instalacion i;
 
             printf("Id de la instalacion: ");
-            scanf("%d", &id_instalacion);
+            scanf("%d", &i.id_instalacion);
 
-            // LIMPIAR BUFFER
             int c;
             while ((c = getchar()) != '\n' && c != EOF);
 
             printf("Nombre de la instalacion: ");
-            fgets(nombre, sizeof(nombre), stdin);
-            nombre[strcspn(nombre, "\n")] = 0;
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[strcspn(buffer, "\n")] = 0;
+            i.nombre = malloc(strlen(buffer) + 1);
+            strcpy(i.nombre, buffer);
 
             printf("Tipo (piscina/pista/gimnasio...): ");
-            fgets(tipo, sizeof(tipo), stdin);
-            tipo[strcspn(tipo, "\n")] = 0;
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[strcspn(buffer, "\n")] = 0;
+            i.tipo = malloc(strlen(buffer) + 1);
+            strcpy(i.tipo, buffer);
 
             printf("Aforo maximo: ");
             scanf("%d", &aforo_maximo);
+            i.aforo_maximo = aforo_maximo;
 
             printf("Precio por hora: ");
             scanf("%lf", &precio_hora);
+            i.precio_hora = precio_hora;
 
-            // limpiar buffer otra vez
             while ((c = getchar()) != '\n' && c != EOF);
 
             printf("Estado (activa/inactiva): ");
-            fgets(estado, sizeof(estado), stdin);
-            estado[strcspn(estado, "\n")] = 0;
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[strcspn(buffer, "\n")] = 0;
+            i.estado = malloc(strlen(buffer) + 1);
+            strcpy(i.estado, buffer);
 
-            Instalacion i = {id_instalacion, nombre, tipo, aforo_maximo, precio_hora, estado};
             modificar_instalacion(db, i);
+
+            free(i.nombre);
+            free(i.tipo);
+            free(i.estado);
             break;
         }
         case 5:
