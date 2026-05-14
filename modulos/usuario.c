@@ -106,18 +106,16 @@ void menu_usuarios(sqlite3 *db)
                 }
 
                 // Validar formato YYYY-MM-DD
-                if (strlen(fecha_nacimiento) != 10 ||
-                    fecha_nacimiento[4] != '-' || fecha_nacimiento[7] != '-') {
-                    printf("Error: Formato incorrecto. Use YYYY-MM-DD\n");
-                    continue;
-                }
-                // Validar que los demas caracteres sean digitos
-                int es_valida = 1;
-                for (int i = 0; i < 10; i++) {
-                    if (i == 4 || i == 7) continue;
-                    if (fecha_nacimiento[i] < '0' || fecha_nacimiento[i] > '9') {
-                        es_valida = 0;
-                        break;
+               int es_valida = 1;
+                if (strlen(fecha_nacimiento) != 10 || fecha_nacimiento[4] != '-' || fecha_nacimiento[7] != '-') {
+                    es_valida = 0;
+                } else {
+                    for (int i = 0; i < 10; i++) {
+                        if (i == 4 || i == 7) continue;
+                        if (fecha_nacimiento[i] < '0' || fecha_nacimiento[i] > '9') {
+                            es_valida = 0;
+                            break;
+                        }
                     }
                 }
                 if (!es_valida) {
@@ -218,13 +216,20 @@ void menu_usuarios(sqlite3 *db)
             int valido = 0;
             int id_usuario = -1;
             char rol[20];
+            int intentos = 0;
 
-            while (!valido) {
+            while (!valido && intentos < 3) {
+                printf("\n--- Intento %d de 3 (Escriba '0' para cancelar) ---\n", intentos + 1);
                 printf("Inserte nombre de usuario: ");
                 {
                     char buffer[50];
                     fgets(buffer, sizeof(buffer), stdin);
                     sscanf(buffer, "%19s", usuario);
+                }
+                    
+                if (strcmp(usuario, "0") == 0) {
+                printf("Operacion cancelada.\n");
+                break; 
                 }
 
                 printf("Inserte la contrasena del usuario: ");
@@ -238,25 +243,24 @@ void menu_usuarios(sqlite3 *db)
                 {
                     char buffer[50];
                     fgets(buffer, sizeof(buffer), stdin);
-                    sscanf(buffer, "%10s", fecha_nacimiento);
+                    if (sscanf(buffer, "%10s", fecha_nacimiento) != 1) {
+                        strcpy(fecha_nacimiento, ""); 
+        }
                 }
 
-                if (strlen(fecha_nacimiento) != 10 ||
-                    fecha_nacimiento[4] != '-' || fecha_nacimiento[7] != '-') {
-                    printf("Error: Formato incorrecto. Use YYYY-MM-DD\n");
-                    continue;
-                }
-                // Validar que los demas caracteres sean digitos
                 int es_valida = 1;
-                for (int i = 0; i < 10; i++) {
-                    if (i == 4 || i == 7) continue;
-                    if (fecha_nacimiento[i] < '0' || fecha_nacimiento[i] > '9') {
-                        es_valida = 0;
-                        break;
+                if (strlen(fecha_nacimiento) != 10 || fecha_nacimiento[4] != '-' || fecha_nacimiento[7] != '-') {
+                    es_valida = 0;
+                } else {
+                    for (int i = 0; i < 10; i++) {
+                        if (i == 4 || i == 7) continue;
+                        if (fecha_nacimiento[i] < '0' || fecha_nacimiento[i] > '9') { es_valida = 0; break; }
                     }
                 }
+
                 if (!es_valida) {
                     printf("Error: La fecha debe contener solo digitos y guiones\n");
+                    intentos++;
                     continue;
                 }
 
@@ -300,9 +304,15 @@ void menu_usuarios(sqlite3 *db)
                     valido = 1;
                 } else {
                     printf("Error: Los datos introducidos no coinciden con ningun usuario.\n");
+                    intentos++;
                 }
                 
                 sqlite3_finalize(stmt);
+            }
+
+            if (!valido) {
+            if (intentos >= 3) printf("Demasiados intentos fallidos. Regresando...\n");
+            break; 
             }
 
             if (strcmp(rol, "admin") == 0) {
@@ -339,6 +349,7 @@ void menu_usuarios(sqlite3 *db)
 int dar_alta_usuario(sqlite3 *db, Usuario u)
 {
     sqlite3_stmt *stmt;
+    int resultado;
     const char *sql = "INSERT INTO usuarios (user, password, rol, fecha_nac) "
                       "VALUES (?, ?, ?, ?)";
 
@@ -367,8 +378,8 @@ int dar_alta_usuario(sqlite3 *db, Usuario u)
         sqlite3_finalize(stmt);
         return 0;
     }
-
-    int resultado = sqlite3_step(stmt);
+    
+    resultado = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
     if (resultado == SQLITE_DONE) {
