@@ -28,22 +28,23 @@ void menu_usuarios(sqlite3 *db)
         //Alta de usuario
         case 1:
         {
-            char buffer[50];
+            // --- Recoger y validar usuario ---
             char usuario[20];
-            char password[20];
-            char fecha_nacimiento[11];
             int valido = 0;
-
             while (!valido) {
                 printf("Inserte nombre de usuario (3-19 caracteres): ");
-                fgets(buffer, sizeof(buffer), stdin);
-                sscanf(buffer, "%19s", usuario);
+                {
+                    char buffer[50];
+                    fgets(buffer, sizeof(buffer), stdin);
+                    sscanf(buffer, "%19s", usuario);
+                }
 
                 if (strlen(usuario) < 3) {
                     printf("Error: El usuario debe tener al menos 3 caracteres.\n");
                     continue;
                 }
 
+                // Comprobar si el usuario ya existe
                 sqlite3_stmt *stmt;
                 const char *sql_check = "SELECT id FROM usuarios WHERE user = ?";
                 if (sqlite3_prepare_v2(db, sql_check, -1, &stmt, NULL) != SQLITE_OK) {
@@ -64,11 +65,17 @@ void menu_usuarios(sqlite3 *db)
                 valido = 1;
             }
 
+            // --- Recoger y validar password ---
+            char password[20];
             int valido2 = 0;
             while (!valido2) {
                 printf("Inserte una contrasena (minimo 6 caracteres): ");
-                fgets(buffer, sizeof(buffer), stdin);
-                sscanf(buffer, "%19s", password);
+                {
+                    char buffer[50];
+                    fgets(buffer, sizeof(buffer), stdin);
+                    sscanf(buffer, "%19s", password);
+                }
+
                 if (strlen(password) < 6) {
                     printf("Error: La contrasena debe tener al menos 6 caracteres.\n");
                     continue;
@@ -76,30 +83,39 @@ void menu_usuarios(sqlite3 *db)
                 valido2 = 1;
             }
 
+            // --- Recoger rol ---
             int rol_opcion;
             char *rol;
             printf("\nSeleccione el rol:\n1. Administrador\n2. Socio\nOpcion: ");
-            fgets(buffer, sizeof(buffer), stdin);
-            sscanf(buffer, "%d", &rol_opcion);
+            {
+                char buffer[50];
+                fgets(buffer, sizeof(buffer), stdin);
+                sscanf(buffer, "%d", &rol_opcion);
+            }
             rol = (rol_opcion == 1) ? "admin" : "socio";
 
+            // --- Recoger y validar fecha de nacimiento ---
+            char fecha_nacimiento[11];
             int fecha_valida = 0;
             while (!fecha_valida) {
                 printf("Inserte fecha de nacimiento (YYYY-MM-DD): ");
-                fgets(buffer, sizeof(buffer), stdin);
-                sscanf(buffer, "%10s", fecha_nacimiento);
-
-                if (strlen(fecha_nacimiento) != 10 ||
-                    fecha_nacimiento[4] != '-' || fecha_nacimiento[7] != '-') {
-                    printf("Error: Formato incorrecto. Use YYYY-MM-DD\n");
-                    continue;
+                {
+                    char buffer[50];
+                    fgets(buffer, sizeof(buffer), stdin);
+                    sscanf(buffer, "%10s", fecha_nacimiento);
                 }
-                int es_valida = 1;
-                for (int i = 0; i < 10; i++) {
-                    if (i == 4 || i == 7) continue;
-                    if (fecha_nacimiento[i] < '0' || fecha_nacimiento[i] > '9') {
-                        es_valida = 0;
-                        break;
+
+                // Validar formato YYYY-MM-DD
+               int es_valida = 1;
+                if (strlen(fecha_nacimiento) != 10 || fecha_nacimiento[4] != '-' || fecha_nacimiento[7] != '-') {
+                    es_valida = 0;
+                } else {
+                    for (int i = 0; i < 10; i++) {
+                        if (i == 4 || i == 7) continue;
+                        if (fecha_nacimiento[i] < '0' || fecha_nacimiento[i] > '9') {
+                            es_valida = 0;
+                            break;
+                        }
                     }
                 }
                 if (!es_valida) {
@@ -109,53 +125,49 @@ void menu_usuarios(sqlite3 *db)
                 fecha_valida = 1;
             }
 
-            Usuario u;
-            u.id = -1;
-            u.user = malloc(strlen(usuario) + 1);
-            strcpy(u.user, usuario);
-            u.password = malloc(strlen(password) + 1);
-            strcpy(u.password, password);
-            u.rol = rol;  // literal, no necesita malloc
-            u.fecha_nac = malloc(strlen(fecha_nacimiento) + 1);
-            strcpy(u.fecha_nac, fecha_nacimiento);
-            u.fecha_alta = NULL;
-            u.id_suscrip = 0;
-
+            Usuario u = {-1, usuario, password, rol, fecha_nacimiento, NULL, 0};
+            // --- Llamar a la función de BD ---
             dar_alta_usuario(db, u);
-
-            free(u.user);
-            free(u.password);
-            free(u.fecha_nac);
             break;
         }
         //Baja de usuario 
         case 2:
         {
-            char buffer[50];
             char usuario[20];
             char password[20];
             int valido = 0;
 
+            // --- Recoger y validar usuario ---
             while (!valido) {
                 printf("Inserte nombre de usuario a dar de baja: ");
-                fgets(buffer, sizeof(buffer), stdin);
-                sscanf(buffer, "%19s", usuario);
+                {
+                    char buffer[50];
+                    fgets(buffer, sizeof(buffer), stdin);
+                    sscanf(buffer, "%19s", usuario);
+                }
 
                 if (strlen(usuario) < 3) {
                     printf("Error: El usuario debe tener al menos 3 caracteres.\n");
                     continue;
                 }
 
+                // --- Recoger password ---
                 printf("Inserte la contrasena del usuario: ");
-                fgets(buffer, sizeof(buffer), stdin);
-                sscanf(buffer, "%19s", password);
+                {
+                    char buffer[50];
+                    fgets(buffer, sizeof(buffer), stdin);
+                    sscanf(buffer, "%19s", password);
+                }
 
+                // --- Comprobar si el usuario y password coinciden ---
                 sqlite3_stmt *stmt;
                 const char *sql_check = "SELECT id FROM usuarios WHERE user = ? AND password = ?";
+
                 if (sqlite3_prepare_v2(db, sql_check, -1, &stmt, NULL) != SQLITE_OK) {
                     printf("Error al preparar la consulta.\n");
                     continue;
                 }
+
                 if (sqlite3_bind_text(stmt, 1, usuario, -1, SQLITE_STATIC) != SQLITE_OK) {
                     printf("Error al bindear usuario\n");
                     sqlite3_finalize(stmt);
@@ -166,85 +178,104 @@ void menu_usuarios(sqlite3 *db)
                     sqlite3_finalize(stmt);
                     continue;
                 }
+
                 if (sqlite3_step(stmt) != SQLITE_ROW) {
                     printf("Error: Usuario o contrasena incorrectos.\n");
                     sqlite3_finalize(stmt);
                     continue;
                 }
+
                 sqlite3_finalize(stmt);
                 valido = 1;
             }
 
+            
+            // --- Confirmacion antes de borrar ---
             char confirmacion;
             printf("¿Seguro que desea dar de baja al usuario '%s'? (s/n): ", usuario);
-            fgets(buffer, sizeof(buffer), stdin);
-            sscanf(buffer, " %c", &confirmacion);
+            {
+                char buffer[50];
+                fgets(buffer, sizeof(buffer), stdin);
+                sscanf(buffer, " %c", &confirmacion);
+            }
 
             if (confirmacion == 's' || confirmacion == 'S') {
-                Usuario u;
-                u.id = -1;
-                u.user = malloc(strlen(usuario) + 1);
-                strcpy(u.user, usuario);
-                u.password = NULL;
-                u.rol = NULL;
-                u.fecha_nac = NULL;
-                u.fecha_alta = NULL;
-                u.id_suscrip = -1;
-
+                Usuario u = {-1, usuario, NULL, NULL, NULL, NULL, -1};
                 dar_baja_usuario(db, u);
-                free(u.user);
             } else {
                 printf("Operacion cancelada.\n");
             }
+
             break;
         }
         case 3:
         {
-            char buffer[50];
             char usuario[20];
             char password[20];
             char fecha_nacimiento[11];
-            char rol[20];
             int valido = 0;
             int id_usuario = -1;
+            char rol[20];
+            int intentos = 0;
 
-            while (!valido) {
+            while (!valido && intentos < 3) {
+                printf("\n--- Intento %d de 3 (Escriba '0' para cancelar) ---\n", intentos + 1);
                 printf("Inserte nombre de usuario: ");
-                fgets(buffer, sizeof(buffer), stdin);
-                sscanf(buffer, "%19s", usuario);
+                {
+                    char buffer[50];
+                    fgets(buffer, sizeof(buffer), stdin);
+                    sscanf(buffer, "%19s", usuario);
+                }
+                    
+                if (strcmp(usuario, "0") == 0) {
+                printf("Operacion cancelada.\n");
+                break; 
+                }
 
                 printf("Inserte la contrasena del usuario: ");
-                fgets(buffer, sizeof(buffer), stdin);
-                sscanf(buffer, "%19s", password);
+                {
+                    char buffer[50];
+                    fgets(buffer, sizeof(buffer), stdin);
+                    sscanf(buffer, "%19s", password);
+                }
 
                 printf("Inserte fecha de nacimiento (YYYY-MM-DD): ");
-                fgets(buffer, sizeof(buffer), stdin);
-                sscanf(buffer, "%10s", fecha_nacimiento);
-
-                if (strlen(fecha_nacimiento) != 10 ||
-                    fecha_nacimiento[4] != '-' || fecha_nacimiento[7] != '-') {
-                    printf("Error: Formato incorrecto. Use YYYY-MM-DD\n");
-                    continue;
+                {
+                    char buffer[50];
+                    fgets(buffer, sizeof(buffer), stdin);
+                    if (sscanf(buffer, "%10s", fecha_nacimiento) != 1) {
+                        strcpy(fecha_nacimiento, ""); 
+        }
                 }
+
                 int es_valida = 1;
-                for (int i = 0; i < 10; i++) {
-                    if (i == 4 || i == 7) continue;
-                    if (fecha_nacimiento[i] < '0' || fecha_nacimiento[i] > '9') {
-                        es_valida = 0;
-                        break;
+                if (strlen(fecha_nacimiento) != 10 || fecha_nacimiento[4] != '-' || fecha_nacimiento[7] != '-') {
+                    es_valida = 0;
+                } else {
+                    for (int i = 0; i < 10; i++) {
+                        if (i == 4 || i == 7) continue;
+                        if (fecha_nacimiento[i] < '0' || fecha_nacimiento[i] > '9') { es_valida = 0; break; }
                     }
                 }
+
                 if (!es_valida) {
                     printf("Error: La fecha debe contener solo digitos y guiones\n");
+                    intentos++;
                     continue;
                 }
 
+                //Preparar consulta
                 sqlite3_stmt *stmt;
-                const char *sql_check = "SELECT id, rol FROM usuarios WHERE user = ? AND password = ? AND fecha_nac = ?";
+                //codigo de SQL
+                const char *sql_check =
+                    "SELECT id, rol FROM usuarios WHERE user = ? AND password = ? AND fecha_nac = ?";
+                //Preparar consulta
                 if (sqlite3_prepare_v2(db, sql_check, -1, &stmt, NULL) != SQLITE_OK) {
                     printf("Error al preparar la consulta.\n");
                     continue;
                 }
+
+                //Pasar los valores
                 if (sqlite3_bind_text(stmt, 1, usuario, -1, SQLITE_STATIC) != SQLITE_OK) {
                     printf("Error al bindear usuario\n");
                     sqlite3_finalize(stmt);
@@ -260,6 +291,7 @@ void menu_usuarios(sqlite3 *db)
                     sqlite3_finalize(stmt);
                     continue;
                 }
+
                 if (sqlite3_step(stmt) == SQLITE_ROW) {
                     id_usuario = sqlite3_column_int(stmt, 0);
                     const char *rol_temp = (const char *)sqlite3_column_text(stmt, 1);
@@ -272,8 +304,15 @@ void menu_usuarios(sqlite3 *db)
                     valido = 1;
                 } else {
                     printf("Error: Los datos introducidos no coinciden con ningun usuario.\n");
+                    intentos++;
                 }
+                
                 sqlite3_finalize(stmt);
+            }
+
+            if (!valido) {
+            if (intentos >= 3) printf("Demasiados intentos fallidos. Regresando...\n");
+            break; 
             }
 
             if (strcmp(rol, "admin") == 0) {
@@ -286,24 +325,14 @@ void menu_usuarios(sqlite3 *db)
 
             int nueva_suscripcion;
             printf("Introduzca el id de la nueva suscripcion: ");
-            fgets(buffer, sizeof(buffer), stdin);
-            sscanf(buffer, "%d", &nueva_suscripcion);
+            {
+                char buffer[50];
+                fgets(buffer, sizeof(buffer), stdin);
+                sscanf(buffer, "%d", &nueva_suscripcion);
+            }
 
-            Usuario u;
-            u.id = id_usuario;
-            u.user = malloc(strlen(usuario) + 1);
-            strcpy(u.user, usuario);
-            u.password = NULL;
-            u.rol = malloc(strlen(rol) + 1);
-            strcpy(u.rol, rol);
-            u.fecha_nac = NULL;
-            u.fecha_alta = NULL;
-            u.id_suscrip = nueva_suscripcion;
-
+            Usuario u = {id_usuario, usuario, NULL, rol, NULL, NULL, nueva_suscripcion};
             modificar_suscripcion_usuario(db, u);
-
-            free(u.user);
-            free(u.rol);
             break;
         }
         case 4:
@@ -320,6 +349,7 @@ void menu_usuarios(sqlite3 *db)
 int dar_alta_usuario(sqlite3 *db, Usuario u)
 {
     sqlite3_stmt *stmt;
+    int resultado;
     const char *sql = "INSERT INTO usuarios (user, password, rol, fecha_nac) "
                       "VALUES (?, ?, ?, ?)";
 
@@ -348,8 +378,8 @@ int dar_alta_usuario(sqlite3 *db, Usuario u)
         sqlite3_finalize(stmt);
         return 0;
     }
-
-    int resultado = sqlite3_step(stmt);
+    
+    resultado = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
     if (resultado == SQLITE_DONE) {
