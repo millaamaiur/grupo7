@@ -5,8 +5,7 @@
 #include "base_datos.h"
 #include <stdlib.h>
 
-
-void menu_cancelacion_reservas(sqlite3* db, int id_socio_actual, int es_admin)
+void menu_cancelacion_reservas(sqlite3 *db, int id_socio_actual, int es_admin)
 {
     int opcion;
 
@@ -19,11 +18,11 @@ void menu_cancelacion_reservas(sqlite3* db, int id_socio_actual, int es_admin)
         printf("4. Consultar reservas por instalacion\n");
         printf("5. Volver\n");
         printf("Seleccione una opcion: ");
-        scanf("%d", &opcion);
-
-        int c;
-        while ((c = getchar()) != '\n' && c != EOF)
-            ;
+        {
+            char buffer[50];
+            fgets(buffer, sizeof(buffer), stdin);
+            sscanf(buffer, "%d", &opcion);
+        }
 
         switch (opcion)
         {
@@ -72,7 +71,11 @@ void menu_cancelacion_reservas(sqlite3* db, int id_socio_actual, int es_admin)
         {
             int id_instalacion;
             printf("ID de la instalacion: ");
-            scanf("%d", &id_instalacion);
+            {
+                char buffer[50];
+                fgets(buffer, sizeof(buffer), stdin);
+                sscanf(buffer, "%d", &id_instalacion);
+            }
             listar_reservas_por_instalacion(db, id_instalacion);
         }
         break;
@@ -89,7 +92,7 @@ void menu_cancelacion_reservas(sqlite3* db, int id_socio_actual, int es_admin)
     } while (opcion != 5);
 }
 
-int verificar_disponibilidad(sqlite3 *db, int id_instalacion, char *fecha, char *hora)
+int verificar_disponibilidad(sqlite3 *db, Reserva r)
 {
 
     sqlite3_stmt *stmt;
@@ -101,9 +104,24 @@ int verificar_disponibilidad(sqlite3 *db, int id_instalacion, char *fecha, char 
         printf("Error al preparar la query\n");
         return 0;
     }
-    sqlite3_bind_int(stmt, 1, id_instalacion);
-    sqlite3_bind_text(stmt, 2, fecha, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, hora, -1, SQLITE_STATIC);
+    if (sqlite3_bind_int(stmt, 1, r.id_instalacion) != SQLITE_OK)
+    {
+        printf("Error al bindear id_instalacion\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
+    if (sqlite3_bind_text(stmt, 2, r.fecha, -1, SQLITE_STATIC) != SQLITE_OK)
+    {
+        printf("Error al bindear fecha\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
+    if (sqlite3_bind_text(stmt, 3, r.hora_inicio, -1, SQLITE_STATIC) != SQLITE_OK)
+    {
+        printf("Error al bindear hora\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
 
     int cantidad = 0;
 
@@ -119,9 +137,9 @@ int verificar_disponibilidad(sqlite3 *db, int id_instalacion, char *fecha, char 
     return (cantidad == 0); // 1 = disponible, 0 = ocupado
 }
 
-int crear_reserva(sqlite3 *db, int id_socio, int id_instalacion, char *fecha, char *hora, int duracion)
+int crear_reserva(sqlite3 *db, Reserva r)
 {
-    if (verificar_disponibilidad(db, id_instalacion, fecha, hora) == 0)
+    if (verificar_disponibilidad(db, r) == 0)
     {
         return 0;
     }
@@ -139,11 +157,36 @@ int crear_reserva(sqlite3 *db, int id_socio, int id_instalacion, char *fecha, ch
     }
 
     // 2. Bind de parámetros
-    sqlite3_bind_int(stmt, 1, id_socio);
-    sqlite3_bind_int(stmt, 2, id_instalacion);
-    sqlite3_bind_text(stmt, 3, fecha, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 4, hora, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 5, duracion);
+    if (sqlite3_bind_int(stmt, 1, r.id_soc) != SQLITE_OK)
+    {
+        printf("Error al bindear id_socio\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
+    if (sqlite3_bind_int(stmt, 2, r.id_instalacion) != SQLITE_OK)
+    {
+        printf("Error al bindear id_instalacion\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
+    if (sqlite3_bind_text(stmt, 3, r.fecha, -1, SQLITE_STATIC) != SQLITE_OK)
+    {
+        printf("Error al bindear fecha\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
+    if (sqlite3_bind_text(stmt, 4, r.hora_inicio, -1, SQLITE_STATIC) != SQLITE_OK)
+    {
+        printf("Error al bindear hora\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
+    if (sqlite3_bind_int(stmt, 5, r.duracion) != SQLITE_OK)
+    {
+        printf("Error al bindear duracion\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
 
     // 3. Ejecutar
     int resultado = sqlite3_step(stmt);
@@ -177,8 +220,18 @@ int cancelar_reserva(sqlite3 *db, int id_reserva, int id_socio)
     }
 
     // 2. Bind de parámetros
-    sqlite3_bind_int(stmt, 1, id_reserva);
-    sqlite3_bind_int(stmt, 2, id_socio);
+    if (sqlite3_bind_int(stmt, 1, id_reserva) != SQLITE_OK)
+    {
+        printf("Error al bindear id_reserva\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
+    if (sqlite3_bind_int(stmt, 2, id_socio) != SQLITE_OK)
+    {
+        printf("Error al bindear id_socio\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
 
     // 3. Ejecutar
     int resultado = sqlite3_step(stmt);
@@ -210,8 +263,18 @@ int cancelar_reserva_admin(sqlite3 *db, int id_reserva, char *motivo)
         printf("Error al preparar la query\n");
         return 0;
     }
-    sqlite3_bind_text(stmt, 1, motivo, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 2, id_reserva);
+    if (sqlite3_bind_text(stmt, 1, motivo, -1, SQLITE_STATIC) != SQLITE_OK)
+    {
+        printf("Error al bindear motivo\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
+    if (sqlite3_bind_int(stmt, 2, id_reserva) != SQLITE_OK)
+    {
+        printf("Error al bindear id_reserva\n");
+        sqlite3_finalize(stmt);
+        return 0;
+    }
 
     // 3. Ejecutar
     int resultado = sqlite3_step(stmt);
@@ -241,7 +304,8 @@ void listar_reservas_activas(sqlite3 *db)
                       "JOIN instalaciones i ON r.id_instalacion = i.id_instalacion "
                       "WHERE r.estado = 'activa'";
 
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+    {
         printf("Error al preparar la query\n");
         return;
     }
@@ -249,31 +313,34 @@ void listar_reservas_activas(sqlite3 *db)
     printf("\n=== RESERVAS ACTIVAS ===\n");
 
     printf("+------+-----------------+----------------------+------------+-------+\n");
-printf("| %-4s | %-15s | %-20s | %-10s | %-5s |\n",
-       "ID", "Socio", "Instalacion", "Fecha", "Hora");
-printf("+------+-----------------+----------------------+------------+-------+\n");
+    printf("| %-4s | %-15s | %-20s | %-10s | %-5s |\n",
+           "ID", "Socio", "Instalacion", "Fecha", "Hora");
+    printf("+------+-----------------+----------------------+------------+-------+\n");
 
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        int id          = sqlite3_column_int(stmt, 0);
-        const char *user        = (const char *)sqlite3_column_text(stmt, 1);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        int id = sqlite3_column_int(stmt, 0);
+        const char *user = (const char *)sqlite3_column_text(stmt, 1);
         const char *instalacion = (const char *)sqlite3_column_text(stmt, 2);
-        const char *fecha       = (const char *)sqlite3_column_text(stmt, 3);
-        const char *hora        = (const char *)sqlite3_column_text(stmt, 4);
+        const char *fecha = (const char *)sqlite3_column_text(stmt, 3);
+        const char *hora = (const char *)sqlite3_column_text(stmt, 4);
 
-        
+        if (user == NULL)
+            user = "N/A";
+        if (instalacion == NULL)
+            instalacion = "N/A";
+        if (fecha == NULL)
+            fecha = "N/A";
+        if (hora == NULL)
+            hora = "N/A";
 
-
-
-printf("| %-4d | %-15s | %-20s | %-10s | %-5s |\n",
-       id, user, instalacion, fecha, hora);
-
-
-printf("+------+-----------------+----------------------+------------+-------+\n");
+        printf("ID: %d | Socio: %s | Instalacion: %s | Fecha: %s | Hora: %s\n",
+               id, user, instalacion, fecha, hora);
     }
 
     sqlite3_finalize(stmt);
     printf("\nPulsa Enter para continuar...");
-    getchar();  
+    getchar();
 }
 
 void listar_reservas_por_socio(sqlite3 *db, int id_socio)
@@ -282,16 +349,24 @@ void listar_reservas_por_socio(sqlite3 *db, int id_socio)
     sqlite3_stmt *stmt_rol;
     const char *sql_rol = "SELECT rol FROM usuarios WHERE id = ?";
 
-    if (sqlite3_prepare_v2(db, sql_rol, -1, &stmt_rol, NULL) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql_rol, -1, &stmt_rol, NULL) != SQLITE_OK)
+    {
         printf("Error al preparar la query\n");
         return;
     }
 
-    sqlite3_bind_int(stmt_rol, 1, id_socio);
+    if (sqlite3_bind_int(stmt_rol, 1, id_socio) != SQLITE_OK)
+    {
+        printf("Error al bindear id_socio\n");
+        sqlite3_finalize(stmt_rol);
+        return;
+    }
 
-    if (sqlite3_step(stmt_rol) == SQLITE_ROW) {
+    if (sqlite3_step(stmt_rol) == SQLITE_ROW)
+    {
         const char *rol = (const char *)sqlite3_column_text(stmt_rol, 0);
-        if (strcmp(rol, "admin") == 0) {
+        if (rol == NULL || strcmp(rol, "admin") == 0)
+        {
             printf("Un administrador no puede tener reservas activas\n");
             sqlite3_finalize(stmt_rol);
             return;
@@ -306,20 +381,34 @@ void listar_reservas_por_socio(sqlite3 *db, int id_socio)
                       "JOIN instalaciones i ON r.id_instalacion = i.id_instalacion "
                       "WHERE r.id_soc = ? AND r.estado = 'activa'";
 
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+    {
         printf("Error al preparar la query\n");
         return;
     }
 
-    sqlite3_bind_int(stmt, 1, id_socio);
-    system("cls");
+    if (sqlite3_bind_int(stmt, 1, id_socio) != SQLITE_OK)
+    {
+        printf("Error al bindear id_socio\n");
+        sqlite3_finalize(stmt);
+        return;
+    }
+
     printf("\n=== MIS RESERVAS ===\n");
 
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        int id                  = sqlite3_column_int(stmt, 0);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        int id = sqlite3_column_int(stmt, 0);
         const char *instalacion = (const char *)sqlite3_column_text(stmt, 1);
-        const char *fecha       = (const char *)sqlite3_column_text(stmt, 2);
-        const char *hora        = (const char *)sqlite3_column_text(stmt, 3);
+        const char *fecha = (const char *)sqlite3_column_text(stmt, 2);
+        const char *hora = (const char *)sqlite3_column_text(stmt, 3);
+
+        if (instalacion == NULL)
+            instalacion = "N/A";
+        if (fecha == NULL)
+            fecha = "N/A";
+        if (hora == NULL)
+            hora = "N/A";
 
         printf("ID: %d | Instalacion: %s | Fecha: %s | Hora: %s\n",
                id, instalacion, fecha, hora);
@@ -337,31 +426,45 @@ void listar_reservas_por_instalacion(sqlite3 *db, int id_instalacion)
                       "JOIN usuarios s ON r.id_soc = s.id "
                       "WHERE r.id_instalacion = ? AND r.estado = 'activa'";
 
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK)
+    {
         printf("Error al preparar la query\n");
         return;
     }
 
-    sqlite3_bind_int(stmt, 1, id_instalacion);
-    system("cls");
+    if (sqlite3_bind_int(stmt, 1, id_instalacion) != SQLITE_OK)
+    {
+        printf("Error al bindear id_instalacion\n");
+        sqlite3_finalize(stmt);
+        return;
+    }
+
     printf("\n=== RESERVAS DE LA INSTALACION ===\n");
 
-        printf("+------+-----------------+------------+-------+\n");
+    printf("+------+-----------------+------------+-------+\n");
     printf("| %-4s | %-15s | %-10s | %-5s |\n",
            "ID", "Socio", "Fecha", "Hora");
     printf("+------+-----------------+------------+-------+\n");
 
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        int id          = sqlite3_column_int(stmt, 0);
-        const char *user  = (const char *)sqlite3_column_text(stmt, 1);
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        int id = sqlite3_column_int(stmt, 0);
+        const char *user = (const char *)sqlite3_column_text(stmt, 1);
         const char *fecha = (const char *)sqlite3_column_text(stmt, 2);
-        const char *hora  = (const char *)sqlite3_column_text(stmt, 3);
+        const char *hora = (const char *)sqlite3_column_text(stmt, 3);
 
-  printf("| %-4d | %-15s | %-10s | %-5s |\n",
-       id, user, fecha, hora);
+        if (user == NULL)
+            user = "N/A";
+        if (fecha == NULL)
+            fecha = "N/A";
+        if (hora == NULL)
+            hora = "N/A";
+
+        printf("ID: %d | Socio: %s | Fecha: %s | Hora: %s\n",
+               id, user, fecha, hora);
     }
 
-     printf("+------+-----------------+------------+-------+\n");
+    printf("+------+-----------------+------------+-------+\n");
 
     sqlite3_finalize(stmt);
 }
