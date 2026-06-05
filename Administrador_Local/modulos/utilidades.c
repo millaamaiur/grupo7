@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "utilidades.h"
+#include "../include/utilidades.h"
 
 void escribir_log(const char* tipo, const char* mensaje) {
     FILE *archivo = fopen("ficherosTexto/log.txt", "a");
