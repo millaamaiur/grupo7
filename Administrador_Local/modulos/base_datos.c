@@ -1,11 +1,10 @@
 #include <stdio.h>
-#include "base_datos.h"
-#include "config.h"
+#include "../include/base_datos.h"
+#include "../include/config.h"
 
-sqlite3* db_open() {
+sqlite3* db_open(const char* db_path) {
     sqlite3 *db = NULL;
-    Config cfg = load_config(CONFIG_PATH);
-    int result = sqlite3_open(cfg.db_path, &db);
+    int result = sqlite3_open(db_path, &db);
 
     if (result != SQLITE_OK) {
         printf("Error al abrir la base de datos\n");

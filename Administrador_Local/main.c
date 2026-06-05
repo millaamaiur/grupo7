@@ -1,18 +1,21 @@
 #include <stdio.h>
-#include "menu_admin.h"
-#include "base_datos.h"
-#include "login.h"
-#include "horario.h"
-#include "instalacion.h"
-#include "reserva.h"
+#include "include/menu_admin.h"
+#include "include/config.h"
+#include "include/base_datos.h"
+#include "include/login.h"
+#include "include/horario.h"
+#include "include/instalacion.h"
+#include "include/reserva.h"
 #include "sqlite3.h"
-#include "taquilla.h"
-#include "usuario.h"
-#include "utilidades.h"
+#include "include/taquilla.h"
+#include "include/usuario.h"
+#include "include/utilidades.h"
+
 int main(void)
 {
     sqlite3 *db;
-    db = db_open();
+    Config cfg = load_config(CONFIG_PATH);
+    db = db_open(cfg.db_path);
 
     if (db == NULL) {
         printf("Error al abrir la base de datos\n");

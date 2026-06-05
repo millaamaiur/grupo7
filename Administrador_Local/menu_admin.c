@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "menu_admin.h"
-#include "usuario.h"
-#include "instalacion.h"
-#include "reserva.h"
+#include "include/menu_admin.h"
+#include "include/usuario.h"
+#include "include/instalacion.h"
+#include "include/reserva.h"
 
 void menu_admin(sqlite3 *db, int id_socio_actual)
 {

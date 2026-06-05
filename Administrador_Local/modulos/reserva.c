@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <sqlite3.h>
-#include "reserva.h"
-#include "base_datos.h"
+#include "../include/reserva.h"
+#include "../include/base_datos.h"
 #include <stdlib.h>
 
 void menu_cancelacion_reservas(sqlite3 *db, int id_socio_actual, int es_admin)
