@@ -5,6 +5,14 @@ using namespace std;
 
 MenuCliente::MenuCliente()
 {
+    this->socket = nullptr;
+    this->id_socio = -1;
+}
+
+MenuCliente::MenuCliente(ClienteSocket* socket, int id_socio)
+{
+    this->socket = socket;
+    this->id_socio = id_socio;
 }
 
 void MenuCliente::mostrarMenuSocio()
@@ -82,20 +90,45 @@ void MenuCliente::menuActividades()
 void MenuCliente::consultarActividades()
 {
     cout << "\n--- CONSULTAR ACTIVIDADES ---" << endl;
-    cout << "[Pendiente] Se solicitaran las actividades disponibles al servidor." << endl;
+
+    if (socket == nullptr)
+    {
+        cout << "No hay conexion con el servidor." << endl;
+        return;
+    }
+
+    socket->enviarMensaje("LISTAR_ACTIVIDADES\n");
+
+    string respuesta = socket->recibirMensaje();
+
+    cout << respuesta << endl;
 }
 
 void MenuCliente::registrarseActividad()
 {
-    int idActividad;
+    int id_actividad;
 
     cout << "\n--- REGISTRARSE EN ACTIVIDAD ---" << endl;
     cout << "Introduce el ID de la actividad: ";
-    cin >> idActividad;
+    cin >> id_actividad;
 
-    cout << "[Pendiente] Se enviara al servidor la inscripcion en la actividad "
-         << idActividad << "." << endl;
+    if (socket == nullptr)
+    {
+        cout << "[Pendiente] No hay conexion con el servidor." << endl;
+        return;
+    }
+
+    string comando = "INSCRIBIR_ACTIVIDAD|" +
+                     to_string(id_socio) + "|" +
+                     to_string(id_actividad) + "\n";
+
+    socket->enviarMensaje(comando);
+
+    string respuesta = socket->recibirMensaje();
+
+    cout << respuesta << endl;
 }
+
 
 //SUBMENU DE TAQUILLAS
 void MenuCliente::menuTaquilla()
@@ -136,19 +169,57 @@ void MenuCliente::menuTaquilla()
 void MenuCliente::consultarTaquilla()
 {
     cout << "\n--- CONSULTAR TAQUILLA ---" << endl;
-    cout << "[Pendiente] Se consultara si el socio tiene una taquilla asignada." << endl;
+
+    if (socket == nullptr)
+    {
+        cout << "[Pendiente] No hay conexion con el servidor." << endl;
+        return;
+    }
+
+    string comando = "CONSULTAR_TAQUILLA|" + to_string(id_socio) + "\n";
+
+    socket->enviarMensaje(comando);
+
+    string respuesta = socket->recibirMensaje();
+
+    cout << respuesta << endl;
 }
 
 void MenuCliente::alquilarTaquilla()
 {
     cout << "\n--- ALQUILAR TAQUILLA ---" << endl;
-    cout << "[Pendiente] Se enviara una solicitud de alquiler de taquilla al servidor." << endl;
+
+    if (socket == nullptr)
+    {
+        cout << "[Pendiente] No hay conexion con el servidor." << endl;
+        return;
+    }
+
+    string comando = "ALQUILAR_TAQUILLA|" + to_string(id_socio) + "\n";
+
+    socket->enviarMensaje(comando);
+
+    string respuesta = socket->recibirMensaje();
+
+    cout << respuesta << endl;
 }
 
 //SUBMENU DE PISCINA
 void MenuCliente::accesoPiscina()
 {
     cout << "\n--- ACCESO PISCINA ---" << endl;
-    cout << "[Pendiente] El servidor comprobara el aforo actual." << endl;
-    cout << "[Pendiente] Si hay aforo disponible, se permitira la entrada." << endl;
+
+    if (socket == nullptr)
+    {
+        cout << "[Pendiente] No hay conexion con el servidor." << endl;
+        return;
+    }
+
+    string comando = "ENTRAR_PISCINA|" + to_string(id_socio) + "\n";
+
+    socket->enviarMensaje(comando);
+
+    string respuesta = socket->recibirMensaje();
+
+    cout << respuesta << endl;
 }

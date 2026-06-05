@@ -1,26 +1,26 @@
 #ifndef MENU_CLIENTE_H
 #define MENU_CLIENTE_H
 
+#include "cliente_socket.h"
+
 class MenuCliente
 {
 private:
+    ClienteSocket* socket;
+    int id_socio;
 
-    //Opcion 1
+    void menuGestionReservas();
+    void menuServiciosCentro();
+    void menuPerfilConfiguracion();
+
     void consultarDisponibilidad();
     void realizarReserva();
     void mostrarReservas();
     void cancelarReserva();
 
-    //Opcion 2
     void menuActividades();
     void menuTaquilla();
     void accesoPiscina();
-
-    //Opcion 3
-    void datosPersonales();
-    void estadoSuscripcion();
-
-    //Opcion 4 -> Salir
 
     void consultarActividades();
     void registrarseActividad();
@@ -28,12 +28,12 @@ private:
     void consultarTaquilla();
     void alquilarTaquilla();
 
-    void menuGestionReservas();
-    void menuServiciosCentro();
-    void menuPerfilConfiguracion();
+    void datosPersonales();
+    void estadoSuscripcion();
 
 public:
     MenuCliente();
+    MenuCliente(ClienteSocket* socket, int id_socio);
 
     void mostrarMenuSocio();
 };
