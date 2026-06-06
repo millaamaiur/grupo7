@@ -32,7 +32,7 @@ bool ClienteSocket::conectar()
     sockaddr_in direccion_servidor;
     direccion_servidor.sin_family = AF_INET;
     direccion_servidor.sin_port = htons(puerto);
-    
+
 direccion_servidor.sin_addr.s_addr = inet_addr(ip_servidor.c_str());
 
 if (direccion_servidor.sin_addr.s_addr == INADDR_NONE)
@@ -45,6 +45,7 @@ if (direccion_servidor.sin_addr.s_addr == INADDR_NONE)
 
     if (connect(socket_cliente, (sockaddr*)&direccion_servidor, sizeof(direccion_servidor)) == SOCKET_ERROR)
     {
+        
         std::cout << "No se pudo conectar con el servidor." << std::endl;
         closesocket(socket_cliente);
         WSACleanup();
