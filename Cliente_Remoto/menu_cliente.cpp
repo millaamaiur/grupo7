@@ -223,3 +223,101 @@ void MenuCliente::accesoPiscina()
 
     cout << respuesta << endl;
 }
+
+//Perfil y configuracion
+void MenuCliente::menuPerfilConfiguracion()
+{
+    int opcion;
+    do
+    {
+        cout << "\n===== 3. PERFIL Y CONFIGURACION =====" << endl;
+        cout << "1. Consultar mis datos personales" << endl;
+        cout << "2. Editar mis datos personales (Usuario/Contrasena)" << endl;
+        cout << "3. Consultar el estado de mi suscripcion" << endl;
+        cout << "4. Volver" << endl;
+        cout << "Seleccione una opcion: ";
+        cin >> opcion;
+
+        // Limpieza de filtro por si el usuario introduce letras por error
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Por favor, introduce un numero valido." << endl;
+            continue;
+        }
+
+        switch (opcion)
+        {
+        case 1:
+            datosPersonales(); 
+            break;
+            
+        case 2:
+            {
+                if (socket == nullptr) {
+                    cout << "Error: Sin conexion con el servidor." << endl;
+                    break;
+                }
+                
+                string nuevo_usuario, nueva_pass;
+                cout << "\n--- EDITAR CREDENCIALES DE ACCESO ---" << endl;
+                cout << "Introduce el nuevo nombre de usuario: ";
+                cin >> nuevo_usuario;
+                cout << "Introduce la nueva contrasena (minimo 6 caracteres): ";
+                cin >> nueva_pass;
+
+                // Empaquetamos la petición con pipes de forma idéntica a tus otros submétodos
+                string comando_editar = "EDITAR_PERFIL|" + to_string(id_socio) + "|" + nuevo_usuario + "|" + nueva_pass + "\n";
+                socket->enviarMensaje(comando_editar);
+                
+                string respuesta_edit = socket->recibirMensaje();
+                cout << respuesta_edit << endl;
+            }
+            break;
+            
+        case 3:
+            estadoSuscripcion();
+            break;
+            
+        case 4:
+            cout << "Volviendo al menu principal..." << endl;
+            break;
+            
+        default:
+            cout << "Opcion no valida." << endl;
+            break;
+        }
+    } while (opcion != 4);
+}
+
+void MenuCliente::datosPersonales()
+{
+    cout << "\n--- CONSULTAR DATOS PERSONALES ---" << endl;
+
+    if (socket == nullptr) {
+        cout << "No hay conexion con el servidor." << endl;
+        return;
+    }
+
+    string comando_ver = "VER_PERFIL|" + to_string(id_socio) + "\n";
+    socket->enviarMensaje(comando_ver);
+    
+    string respuesta = socket->recibirMensaje();
+    cout << respuesta << endl;
+}
+
+void MenuCliente::estadoSuscripcion()
+{
+    cout << "\n--- CONSULTAR ESTADO DE LA SUSCRIPCION ---" << endl;
+
+    if (socket == nullptr) {
+        cout << "No hay conexion con el servidor." << endl;
+        return;
+    }
+
+    string comando = "VER_SUSCRIPCION|" + to_string(id_socio) + "\n";
+    socket->enviarMensaje(comando);
+
+    string respuesta = socket->recibirMensaje();
+    cout << respuesta << endl;
+}
