@@ -1,6 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
-#define CONFIG_PATH "ficherosTexto/confic.txt"
+#define CONFIG_PATH "../ficherosTexto/confic.txt"
 
 typedef struct {
     char admin_user[128];
