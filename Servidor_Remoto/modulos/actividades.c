@@ -32,34 +32,33 @@ void consultar_actividades_db(sqlite3 *db, char *resultado){
     sqlite3_finalize(stmt);
 }
 
-void registrarse_actividad_db(sqlite3 *db, int id_socio, int id_actividad){
+void registrarse_actividad_db(sqlite3 *db, int id_socio, int id_actividad, char *respuesta) {
     sqlite3_stmt *stmt;
-    const char *sql = "INSERT INTO participantes_actividades (id_soc, id_actividad, fecha_apunte) VALUES (?, ?, DATETIME('now', 'localtime'))";
+    const char *sql = "INSERT INTO participantes_actividades (id_soc, id_actividad, fecha_apunte) "
+                      "VALUES (?, ?, DATETIME('now', 'localtime'))";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        printf("Error al preparar la query de inscripcion\n");
-        return 0; 
+        strcpy(respuesta, "ACTIVIDAD_RESP;ERROR;Error al preparar la inscripcion");
+        return;
     }
 
     if (sqlite3_bind_int(stmt, 1, id_socio) != SQLITE_OK) {
-        printf("Error al bindear id_soc\n");
+        strcpy(respuesta, "ACTIVIDAD_RESP;ERROR;Error interno");
         sqlite3_finalize(stmt);
-        return 0;
+        return;
     }
     if (sqlite3_bind_int(stmt, 2, id_actividad) != SQLITE_OK) {
-        printf("Error al bindear id_actividad\n");
+        strcpy(respuesta, "ACTIVIDAD_RESP;ERROR;Error interno");
         sqlite3_finalize(stmt);
-        return 0;
+        return;
     }
 
     int resultado = sqlite3_step(stmt);
-    
     sqlite3_finalize(stmt);
 
     if (resultado == SQLITE_DONE) {
-        return 1; 
+        strcpy(respuesta, "ACTIVIDAD_RESP;OK;Inscripcion realizada correctamente");
+    } else {
+        strcpy(respuesta, "ACTIVIDAD_RESP;ERROR;No se pudo realizar la inscripcion");
     }
-    
-    printf("Error: No se pudo ejecutar la inscripcion en la BD (Código: %d)\n", resultado);
-    return 0;
 }
