@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "taquilla.h"
+#include "../include/taquilla.h"
 
 
 
