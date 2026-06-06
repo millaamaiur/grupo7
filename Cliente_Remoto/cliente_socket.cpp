@@ -32,8 +32,10 @@ bool ClienteSocket::conectar()
     sockaddr_in direccion_servidor;
     direccion_servidor.sin_family = AF_INET;
     direccion_servidor.sin_port = htons(puerto);
+    
+direccion_servidor.sin_addr.s_addr = inet_addr(ip_servidor.c_str());
 
-    if (inet_pton(AF_INET, ip_servidor.c_str(), &direccion_servidor.sin_addr) <= 0)
+if (direccion_servidor.sin_addr.s_addr == INADDR_NONE)
     {
         std::cout << "Direccion IP no valida." << std::endl;
         closesocket(socket_cliente);
