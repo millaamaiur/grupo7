@@ -52,6 +52,47 @@ void MenuCliente::mostrarMenuSocio()
     } while (opcion != 4);
 }
 
+//MENU DE SERVICIOS DEL CENTRO
+void MenuCliente::menuServiciosCentro()
+{
+    int opcion;
+
+    do
+    {
+        cout << "\n===== SERVICIOS DEL CENTRO =====" << endl;
+        cout << "1. Actividades" << endl;
+        cout << "2. Taquilla" << endl;
+        cout << "3. Acceso piscina" << endl;
+        cout << "4. Volver" << endl;
+        cout << "Seleccione una opcion: ";
+        cin >> opcion;
+
+        switch (opcion)
+        {
+        case 1:
+            menuActividades();
+            break;
+
+        case 2:
+            menuTaquilla();
+            break;
+
+        case 3:
+            accesoPiscina();
+            break;
+
+        case 4:
+            cout << "Volviendo al menu de socio..." << endl;
+            break;
+
+        default:
+            cout << "Opcion no valida." << endl;
+            break;
+        }
+
+    } while (opcion != 4);
+}
+
 //SUBMENU DE ACTIVIDADES
 void MenuCliente::menuActividades()
 {
@@ -266,7 +307,7 @@ void MenuCliente::menuPerfilConfiguracion()
                 cin >> nueva_pass;
 
                 // Empaquetamos la petición con pipes de forma idéntica a tus otros submétodos
-                string comando_editar = "EDITAR_PERFIL|" + id_socio + "|" + nuevo_usuario + "|" + nueva_pass + "\n";
+                string comando_editar = "EDITAR_PERFIL;" + id_socio + ";" + nuevo_usuario + ";" + nueva_pass + "\n";
                 socket->enviarMensaje(comando_editar);
                 
                 string respuesta_edit = socket->recibirMensaje();
@@ -298,7 +339,7 @@ void MenuCliente::datosPersonales()
         return;
     }
 
-    string comando_ver = "VER_PERFIL|" + id_socio + "\n";
+    string comando_ver = "VER_PERFIL;" + id_socio + "\n";
     socket->enviarMensaje(comando_ver);
     
     string respuesta = socket->recibirMensaje();
@@ -314,7 +355,7 @@ void MenuCliente::estadoSuscripcion()
         return;
     }
 
-    string comando = "VER_SUSCRIPCION|" + id_socio + "\n";
+    string comando = "VER_SUSCRIPCION;" + id_socio + "\n";
     socket->enviarMensaje(comando);
 
     string respuesta = socket->recibirMensaje();
@@ -381,9 +422,9 @@ void MenuCliente::consultarDisponibilidad()
         return;
     }
 
-    string comando = "CONSULTAR_DISPONIBILIDAD|" +
-                     to_string(id_instalacion) + "|" +
-                     fecha + "|" +
+    string comando = "CONSULTAR_DISPONIBILIDAD;" +
+                     to_string(id_instalacion) + ";" +
+                     fecha + ";" +
                      hora + "\n";
 
     socket->enviarMensaje(comando);
@@ -414,11 +455,11 @@ void MenuCliente::realizarReserva()
         return;
     }
 
-    string comando = "REALIZAR_RESERVA|" +
-                    id_socio + "|" +
+    string comando = "REALIZAR_RESERVA;" +
+                    id_socio + ";" +
                      to_string(id_instalacion) + "|" +
-                     fecha + "|" +
-                     hora + "|" +
+                     fecha + ";" +
+                     hora + ";" +
                      to_string(duracion) + "\n";
 
     socket->enviarMensaje(comando);
@@ -437,7 +478,7 @@ void MenuCliente::mostrarReservas()
         return;
     }
 
-    string comando = "MOSTRAR_RESERVAS|" + id_socio + "\n";
+    string comando = "MOSTRAR_RESERVAS;" + id_socio + "\n";
 
     socket->enviarMensaje(comando);
 
@@ -459,8 +500,8 @@ void MenuCliente::cancelarReserva()
         return;
     }
 
-    string comando = "CANCELAR_RESERVA|" +
-                     id_socio + "|" +
+    string comando = "CANCELAR_RESERVA;" +
+                     id_socio + ";" +
                      to_string(id_reserva) + "\n";
 
     socket->enviarMensaje(comando);
