@@ -1,25 +1,27 @@
 #ifndef INSTALACION_H_
 #define INSTALACION_H_
+
 #include <sqlite3.h>
+#include <string>
 
 
-typedef struct 
-{
-    int id_instalacion;
-    char* nombre;
-    char* tipo;
-    int aforo_maximo;
-    double precio_hora;
-    char* estado;
-} Instalacion;
+using namespace std;
 
 void menu_instalaciones(sqlite3 *db);
 
 void ver_ocupacion_instalaciones(sqlite3 *db);
-int alta_instalacion(sqlite3 *db, Instalacion i);
+
+int alta_instalacion(sqlite3 *db, const string &nombre, const string &tipo,
+                     int aforo_maximo, double precio_hora, const string &estado);
+
 int baja_instalacion(sqlite3 *db, int id_instalacion);
-int modificar_instalacion(sqlite3 *db, Instalacion i);
+
+int modificar_instalacion(sqlite3 *db, int id_instalacion, const string &nombre,
+                          const string &tipo, int aforo_maximo,
+                          double precio_hora, const string &estado);
+
 int bloquear_mantenimiento(sqlite3 *db, int id_instalacion);
+
 void consultar_instalaciones(sqlite3 *db);
 
 #endif

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "menu_cliente.h"
+#include <string>
 
 using namespace std;
 
@@ -265,7 +266,7 @@ void MenuCliente::menuPerfilConfiguracion()
                 cin >> nueva_pass;
 
                 // Empaquetamos la petición con pipes de forma idéntica a tus otros submétodos
-                string comando_editar = "EDITAR_PERFIL|" + to_string(id_socio) + "|" + nuevo_usuario + "|" + nueva_pass + "\n";
+                string comando_editar = "EDITAR_PERFIL|" + id_socio + "|" + nuevo_usuario + "|" + nueva_pass + "\n";
                 socket->enviarMensaje(comando_editar);
                 
                 string respuesta_edit = socket->recibirMensaje();
@@ -297,7 +298,7 @@ void MenuCliente::datosPersonales()
         return;
     }
 
-    string comando_ver = "VER_PERFIL|" + to_string(id_socio) + "\n";
+    string comando_ver = "VER_PERFIL|" + id_socio + "\n";
     socket->enviarMensaje(comando_ver);
     
     string respuesta = socket->recibirMensaje();
@@ -313,7 +314,155 @@ void MenuCliente::estadoSuscripcion()
         return;
     }
 
-    string comando = "VER_SUSCRIPCION|" + to_string(id_socio) + "\n";
+    string comando = "VER_SUSCRIPCION|" + id_socio + "\n";
+    socket->enviarMensaje(comando);
+
+    string respuesta = socket->recibirMensaje();
+    cout << respuesta << endl;
+}
+
+// SUBMENU DE RESERVAS
+void MenuCliente::menuGestionReservas()
+{
+    int opcion;
+
+    do
+    {
+        cout << "\n===== GESTION DE RESERVAS =====" << endl;
+        cout << "1. Consultar disponibilidad" << endl;
+        cout << "2. Realizar reserva" << endl;
+        cout << "3. Mostrar reservas" << endl;
+        cout << "4. Cancelar reserva" << endl;
+        cout << "5. Volver" << endl;
+        cout << "Seleccione una opcion: ";
+        cin >> opcion;
+
+        switch (opcion)
+        {
+        case 1:
+            consultarDisponibilidad();
+            break;
+        case 2:
+            realizarReserva();
+            break;
+        case 3:
+            mostrarReservas();
+            break;
+        case 4:
+            cancelarReserva();
+            break;
+        case 5:
+            cout << "Volviendo al menu principal..." << endl;
+            break;
+        default:
+            cout << "Opcion no valida." << endl;
+            break;
+        }
+
+    } while (opcion != 5);
+}
+
+void MenuCliente::consultarDisponibilidad()
+{
+    int id_instalacion;
+    string fecha, hora;
+
+    cout << "\n--- CONSULTAR DISPONIBILIDAD ---" << endl;
+    cout << "ID instalacion: ";
+    cin >> id_instalacion;
+    cout << "Fecha (YYYY-MM-DD): ";
+    cin >> fecha;
+    cout << "Hora inicio (HH:MM): ";
+    cin >> hora;
+
+    if (socket == nullptr)
+    {
+        cout << "No hay conexion con el servidor." << endl;
+        return;
+    }
+
+    string comando = "CONSULTAR_DISPONIBILIDAD|" +
+                     to_string(id_instalacion) + "|" +
+                     fecha + "|" +
+                     hora + "\n";
+
+    socket->enviarMensaje(comando);
+
+    string respuesta = socket->recibirMensaje();
+    cout << respuesta << endl;
+}
+
+void MenuCliente::realizarReserva()
+{
+    int id_instalacion;
+    int duracion;
+    string fecha, hora;
+
+    cout << "\n--- REALIZAR RESERVA ---" << endl;
+    cout << "ID instalacion: ";
+    cin >> id_instalacion;
+    cout << "Fecha (YYYY-MM-DD): ";
+    cin >> fecha;
+    cout << "Hora inicio (HH:MM): ";
+    cin >> hora;
+    cout << "Duracion en minutos: ";
+    cin >> duracion;
+
+    if (socket == nullptr)
+    {
+        cout << "No hay conexion con el servidor." << endl;
+        return;
+    }
+
+    string comando = "REALIZAR_RESERVA|" +
+                    id_socio + "|" +
+                     to_string(id_instalacion) + "|" +
+                     fecha + "|" +
+                     hora + "|" +
+                     to_string(duracion) + "\n";
+
+    socket->enviarMensaje(comando);
+
+    string respuesta = socket->recibirMensaje();
+    cout << respuesta << endl;
+}
+
+void MenuCliente::mostrarReservas()
+{
+    cout << "\n--- MIS RESERVAS ---" << endl;
+
+    if (socket == nullptr)
+    {
+        cout << "No hay conexion con el servidor." << endl;
+        return;
+    }
+
+    string comando = "MOSTRAR_RESERVAS|" + id_socio + "\n";
+
+    socket->enviarMensaje(comando);
+
+    string respuesta = socket->recibirMensaje();
+    cout << respuesta << endl;
+}
+
+void MenuCliente::cancelarReserva()
+{
+    int id_reserva;
+
+    cout << "\n--- CANCELAR RESERVA ---" << endl;
+    cout << "Introduce el ID de la reserva: ";
+    cin >> id_reserva;
+
+    if (socket == nullptr)
+    {
+        cout << "No hay conexion con el servidor." << endl;
+        return;
+    }
+
+    string comando = "CANCELAR_RESERVA|" +
+                     id_socio + "|" +
+                     to_string(id_reserva) + "\n";
+
     socket->enviarMensaje(comando);
 
     string respuesta = socket->recibirMensaje();
