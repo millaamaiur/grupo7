@@ -18,12 +18,13 @@ void consultar_actividades_db(sqlite3 *db, char *resultado){
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         int id_actividad = sqlite3_column_int(stmt, 0);
         const unsigned char *nombre = sqlite3_column_text(stmt, 1);
-        int dia_semana = sqlite3_column_int(stmt, 2);
-        const unsigned char *hora_inicio = sqlite3_column_text(stmt, 3);
-        int duracion = sqlite3_column_int(stmt, 4);
+        int id_instalacion = sqlite3_column_int(stmt, 2);
+        int dia_semana = sqlite3_column_int(stmt, 3);
+        const unsigned char *hora_inicio = sqlite3_column_text(stmt, 4);
+        int duracion = sqlite3_column_int(stmt, 5);
 
         char fila[256];
-        sprintf(fila, ";[%d,%s,%d,%s,%d min]", id_actividad, nombre, dia_semana, hora_inicio, duracion);
+        sprintf(fila, ";[%d,%s,%d,%d,%s,%d min]", id_actividad, nombre, id_instalacion, dia_semana, hora_inicio, duracion);
         
         strcat(resultado, fila);
     }
