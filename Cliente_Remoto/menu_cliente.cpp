@@ -238,7 +238,6 @@ void MenuCliente::menuPerfilConfiguracion()
         cout << "Seleccione una opcion: ";
         cin >> opcion;
 
-        // Limpieza de filtro por si el usuario introduce letras por error
         if (cin.fail()) {
             cin.clear();
             cin.ignore(10000, '\n');
@@ -266,7 +265,6 @@ void MenuCliente::menuPerfilConfiguracion()
                 cout << "Introduce la nueva contrasena (minimo 6 caracteres): ";
                 cin >> nueva_pass;
 
-                // Empaquetamos la petición con pipes de forma idéntica a tus otros submétodos
                 string comando_editar = "EDITAR_PERFIL|" + to_string(id_socio) + "|" + nuevo_usuario + "|" + nueva_pass + "\n";
                 socket->enviarMensaje(comando_editar);
                 
