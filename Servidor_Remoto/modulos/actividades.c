@@ -8,11 +8,11 @@ void consultar_actividades_db(sqlite3 *db, char *resultado){
     const char *sql = "SELECT id_actividad, nombre, dia_semana, hora_inicio, duracion FROM actividades";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        strcpy(resultado, "ACTIVIDADES_RESP;ERROR;Error al consultar la base de datos");
+        strcpy(resultado, "ACTIVIDADES_RESP; ERROR; Error al consultar la base de datos");
         return;
     }
 
-    strcpy(resultado, "ACTIVIDADES_RESP;OK");
+    strcpy(resultado, "ACTIVIDADES_RESP; OK");
 
     // Recorrer las filas
     while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -38,17 +38,17 @@ void registrarse_actividad_db(sqlite3 *db, int id_socio, int id_actividad, char 
                       "VALUES (?, ?, DATETIME('now', 'localtime'))";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "ACTIVIDAD_RESP;ERROR;Error al preparar la inscripcion");
+        strcpy(respuesta, "ACTIVIDAD_RESP; ERROR; Error al preparar la inscripcion");
         return;
     }
 
     if (sqlite3_bind_int(stmt, 1, id_socio) != SQLITE_OK) {
-        strcpy(respuesta, "ACTIVIDAD_RESP;ERROR;Error interno");
+        strcpy(respuesta, "ACTIVIDAD_RESP; ERROR; Error interno");
         sqlite3_finalize(stmt);
         return;
     }
     if (sqlite3_bind_int(stmt, 2, id_actividad) != SQLITE_OK) {
-        strcpy(respuesta, "ACTIVIDAD_RESP;ERROR;Error interno");
+        strcpy(respuesta, "ACTIVIDAD_RESP; ERROR; Error interno");
         sqlite3_finalize(stmt);
         return;
     }
@@ -57,8 +57,8 @@ void registrarse_actividad_db(sqlite3 *db, int id_socio, int id_actividad, char 
     sqlite3_finalize(stmt);
 
     if (resultado == SQLITE_DONE) {
-        strcpy(respuesta, "ACTIVIDAD_RESP;OK;Inscripcion realizada correctamente");
+        strcpy(respuesta, "ACTIVIDAD_RESP; OK; Inscripcion realizada correctamente");
     } else {
-        strcpy(respuesta, "ACTIVIDAD_RESP;ERROR;No se pudo realizar la inscripcion");
+        strcpy(respuesta, "ACTIVIDAD_RESP; ERROR; No se pudo realizar la inscripcion");
     }
 }
