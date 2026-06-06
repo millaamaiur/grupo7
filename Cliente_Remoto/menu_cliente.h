@@ -1,13 +1,16 @@
 #ifndef MENU_CLIENTE_H
 #define MENU_CLIENTE_H
 
+#include <string>
 #include "cliente_socket.h"
+
+using namespace std;
 
 class MenuCliente
 {
 private:
     ClienteSocket* socket;
-    int id_socio;
+    string id_socio;
 
     void menuGestionReservas();
     void menuServiciosCentro();
@@ -33,7 +36,7 @@ private:
 
 public:
     MenuCliente();
-    MenuCliente(ClienteSocket* socket, int id_socio);
+    MenuCliente(ClienteSocket* socket, string id_socio);
 
     void mostrarMenuSocio();
 };

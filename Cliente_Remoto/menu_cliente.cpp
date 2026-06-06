@@ -6,10 +6,10 @@ using namespace std;
 MenuCliente::MenuCliente()
 {
     this->socket = nullptr;
-    this->id_socio = -1;
+    this->id_socio = "";
 }
 
-MenuCliente::MenuCliente(ClienteSocket* socket, int id_socio)
+MenuCliente::MenuCliente(ClienteSocket* socket, string id_socio)
 {
     this->socket = socket;
     this->id_socio = id_socio;
@@ -106,21 +106,19 @@ void MenuCliente::consultarActividades()
 
 void MenuCliente::registrarseActividad()
 {
-    int id_actividad;
+    string idActividad;
 
     cout << "\n--- REGISTRARSE EN ACTIVIDAD ---" << endl;
     cout << "Introduce el ID de la actividad: ";
-    cin >> id_actividad;
+    cin >> idActividad;
 
     if (socket == nullptr)
     {
-        cout << "[Pendiente] No hay conexion con el servidor." << endl;
+        cout << "No hay conexion con el servidor." << endl;
         return;
     }
 
-    string comando = "INSCRIBIR_ACTIVIDAD|" +
-                     to_string(id_socio) + "|" +
-                     to_string(id_actividad) + "\n";
+    string comando = "INSCRIBIR_ACTIVIDAD;" + id_socio + ";" + idActividad + "\n";
 
     socket->enviarMensaje(comando);
 
@@ -172,11 +170,11 @@ void MenuCliente::consultarTaquilla()
 
     if (socket == nullptr)
     {
-        cout << "[Pendiente] No hay conexion con el servidor." << endl;
+        cout << "No hay conexion con el servidor." << endl;
         return;
     }
 
-    string comando = "CONSULTAR_TAQUILLA|" + to_string(id_socio) + "\n";
+    string comando = "CONSULTAR_TAQUILLA;" + id_socio + "\n";
 
     socket->enviarMensaje(comando);
 
@@ -191,11 +189,11 @@ void MenuCliente::alquilarTaquilla()
 
     if (socket == nullptr)
     {
-        cout << "[Pendiente] No hay conexion con el servidor." << endl;
+        cout << "No hay conexion con el servidor." << endl;
         return;
     }
 
-    string comando = "ALQUILAR_TAQUILLA|" + to_string(id_socio) + "\n";
+    string comando = "ALQUILAR_TAQUILLA;" + id_socio + "\n";
 
     socket->enviarMensaje(comando);
 
@@ -211,11 +209,11 @@ void MenuCliente::accesoPiscina()
 
     if (socket == nullptr)
     {
-        cout << "[Pendiente] No hay conexion con el servidor." << endl;
+        cout << "No hay conexion con el servidor." << endl;
         return;
     }
 
-    string comando = "ENTRAR_PISCINA|" + to_string(id_socio) + "\n";
+    string comando = "ENTRAR_PISCINA;" + id_socio + "\n";
 
     socket->enviarMensaje(comando);
 
