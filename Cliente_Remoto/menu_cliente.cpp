@@ -201,8 +201,13 @@ void MenuCliente::cancelarReserva()
 
     socket->enviarMensaje(comando);
 
+    
     string respuesta = socket->recibirMensaje();
     cout << respuesta << endl;
+<<<<<<< HEAD
+
+}
+=======
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -537,3 +542,4 @@ void MenuCliente::estadoSuscripcion()
     string respuesta = socket->recibirMensaje();
     cout << respuesta << endl;
 }
+>>>>>>> origin/main
