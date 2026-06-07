@@ -7,6 +7,7 @@
 #include "include/base_datos.h"
 #include "include/config.h"
 #include "include/protocolo.h"
+#include "include/log.h"
 
 #define BUFFER_SIZE 1024
 
@@ -52,13 +53,17 @@ int main(void)
     }
 
     // 5. Listen
-    listen(servidor, 1);
+    listen(servidor, 5); // Para admitir hasta 5 clientes (prueba)
     printf("Servidor escuchando en puerto %d...\n", cfg.puerto);
+
+    guardar_log(cfg.log_path, "INFO", "Servidor escuchando correctamente.");
 
     // 6. Loop principal
     while (1) {
         SOCKET cliente = accept(servidor, NULL, NULL);
         if (cliente == INVALID_SOCKET) continue;
+
+        guardar_log(cfg.log_path, "INFO", "Cliente conectado");
 
         printf("Cliente conectado\n");
 
@@ -66,12 +71,19 @@ int main(void)
         int bytes;
         while ((bytes = recv(cliente, buffer, sizeof(buffer) - 1, 0)) > 0) {
             buffer[bytes] = '\0';
+
+            char log_msg[256];
+            sprintf(log_msg, "Peticion recibida: %s", buffer);
+            guardar_log(cfg.log_path, "INFO", log_msg);
+
             char respuesta[BUFFER_SIZE];
-            procesar_comando(db, buffer, respuesta);
+            procesar_comando(db, buffer, respuesta, cfg.log_path);
             send(cliente, respuesta, strlen(respuesta), 0);
+
+            memset(buffer, 0, BUFFER_SIZE); // limpiar el buffer
         }
 
-        printf("Cliente desconectado\n");
+        guardar_log(cfg.log_path, "INFO", "Cliente desconectado");
         closesocket(cliente);
     }
 
