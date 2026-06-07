@@ -97,7 +97,7 @@ void MenuCliente::consultarActividades()
         return;
     }
 
-    socket->enviarMensaje("LISTAR_ACTIVIDADES\n");
+    socket->enviarMensaje("LISTAR_ACTIVIDADES");
 
     string respuesta = socket->recibirMensaje();
 
@@ -118,7 +118,7 @@ void MenuCliente::registrarseActividad()
         return;
     }
 
-    string comando = "INSCRIBIR_ACTIVIDAD; " + id_socio + "; " + idActividad + "\n";
+    string comando = "INSCRIBIR_ACTIVIDAD; " + id_socio + "; " + idActividad + "";
 
     socket->enviarMensaje(comando);
 
@@ -174,7 +174,7 @@ void MenuCliente::consultarTaquilla()
         return;
     }
 
-    string comando = "CONSULTAR_TAQUILLA; " + id_socio + "\n";
+    string comando = "CONSULTAR_TAQUILLA; " + id_socio + "";
 
     socket->enviarMensaje(comando);
 
@@ -193,7 +193,7 @@ void MenuCliente::alquilarTaquilla()
         return;
     }
 
-    string comando = "ALQUILAR_TAQUILLA; " + id_socio + "\n";
+    string comando = "ALQUILAR_TAQUILLA; " + id_socio + "";
 
     socket->enviarMensaje(comando);
 
@@ -213,7 +213,7 @@ void MenuCliente::accesoPiscina()
         return;
     }
 
-    string comando = "ENTRAR_PISCINA; " + id_socio + "\n";
+    string comando = "ENTRAR_PISCINA; " + id_socio + "";
 
     socket->enviarMensaje(comando);
 
@@ -265,7 +265,7 @@ void MenuCliente::menuPerfilConfiguracion()
                 cin >> nueva_pass;
 
                 // Empaquetamos la petición con pipes de forma idéntica a tus otros submétodos
-                string comando_editar = "EDITAR_PERFIL; " + to_string(id_socio) + "; " + nuevo_usuario + "; " + nueva_pass + "\n";
+                string comando_editar = "EDITAR_PERFIL; " + to_string(id_socio) + "; " + nuevo_usuario + "; " + nueva_pass + "";
                 socket->enviarMensaje(comando_editar);
                 
                 string respuesta_edit = socket->recibirMensaje();
@@ -297,7 +297,7 @@ void MenuCliente::datosPersonales()
         return;
     }
 
-    string comando_ver = "VER_PERFIL; " + to_string(id_socio) + "\n";
+    string comando_ver = "VER_PERFIL; " + to_string(id_socio) + "";
     socket->enviarMensaje(comando_ver);
     
     string respuesta = socket->recibirMensaje();
@@ -313,7 +313,7 @@ void MenuCliente::estadoSuscripcion()
         return;
     }
 
-    string comando = "VER_SUSCRIPCION; " + to_string(id_socio) + "\n";
+    string comando = "VER_SUSCRIPCION; " + to_string(id_socio) + "";
     socket->enviarMensaje(comando);
 
     string respuesta = socket->recibirMensaje();
