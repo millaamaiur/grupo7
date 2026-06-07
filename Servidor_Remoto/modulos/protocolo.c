@@ -5,12 +5,14 @@
 #include "../include/instalacion.h"
 #include "../include/perfil.h"
 #include "../include/reservas.h"
+#include "../include/log.h"
+#include "../include/config.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-void procesar_comando(sqlite3 *db, char *buffer, char *respuesta) {
+void procesar_comando(sqlite3 *db, char *buffer, char *respuesta, const char *ruta_log) {
 
     // Limpiar posibles \r\n al final
     buffer[strcspn(buffer, "\r\n")] = '\0';
@@ -22,6 +24,7 @@ void procesar_comando(sqlite3 *db, char *buffer, char *respuesta) {
 
     char *comando = strtok(copia, ";");
     if (comando == NULL) {
+        guardar_log(ruta_log, "WARN", "Se recibio un intento de comando vacio.");
         strcpy(respuesta, "ERROR; Comando vacio");
         return;
     }
@@ -31,16 +34,26 @@ void procesar_comando(sqlite3 *db, char *buffer, char *respuesta) {
         char *usuario  = strtok(NULL, ";");
         char *password = strtok(NULL, ";");
         if (usuario == NULL || password == NULL) {
+            guardar_log(ruta_log, "WARN", "Intento de LOGIN fallido: faltan parametros.");
             strcpy(respuesta, "ERROR; Faltan parametros");
             return;
         }
         int id = 0;
         LoginResult resultado = login_db(db, usuario, password, &id);
         if (resultado == LOGIN_ADMIN) {
+            char log_msg[128];
+            sprintf(log_msg, "LOGIN EXITOSO: Administrador ID %d autenticado.", id);
+            guardar_log(ruta_log, "INFO", log_msg);
             sprintf(respuesta, "OK_ADMIN;%d", id);
         } else if (resultado == LOGIN_SOCIO) {
+            char log_msg[128];
+            sprintf(log_msg, "LOGIN EXITOSO: Socio ID %d autenticado.", id);
+            guardar_log(ruta_log, "INFO", log_msg);
             sprintf(respuesta, "OK_SOCIO;%d", id);
         } else {
+            char log_msg[128];
+            sprintf(log_msg, "Intento de LOGIN denegado para usuario: '%s'.", usuario);
+            guardar_log(ruta_log, "WARN", log_msg);
             strcpy(respuesta, "ERROR; Credenciales incorrectas");
         }
     }
@@ -55,6 +68,7 @@ void procesar_comando(sqlite3 *db, char *buffer, char *respuesta) {
         char *s_id_socio     = strtok(NULL, ";");
         char *s_id_actividad = strtok(NULL, ";");
         if (s_id_socio == NULL || s_id_actividad == NULL) {
+            guardar_log(ruta_log, "WARN", "Fallo al inscribir actividad: faltan parametros.");
             strcpy(respuesta, "ERROR; Faltan parametros");
             return;
         }
@@ -104,6 +118,7 @@ void procesar_comando(sqlite3 *db, char *buffer, char *respuesta) {
         char *nuevo_usuario = strtok(NULL, ";");
         char *nueva_pass    = strtok(NULL, ";");
         if (s_id == NULL || nuevo_usuario == NULL || nueva_pass == NULL) {
+            guardar_log(ruta_log, "WARN", "Editar perfil: faltan parametros.");
             strcpy(respuesta, "ERROR; Faltan parametros");
             return;
         }
@@ -126,6 +141,7 @@ void procesar_comando(sqlite3 *db, char *buffer, char *respuesta) {
         char *s_duracion      = strtok(NULL, ";");
         if (s_id_socio == NULL || s_id_instalacion == NULL || fecha == NULL ||
             hora_inicio == NULL || s_duracion == NULL) {
+            guardar_log(ruta_log, "WARN", "Crear reserva: faltan parametros.");
             strcpy(respuesta, "ERROR; Faltan parametros");
             return;
         }
@@ -138,6 +154,7 @@ void procesar_comando(sqlite3 *db, char *buffer, char *respuesta) {
         char *s_id_socio   = strtok(NULL, ";");
         char *s_id_reserva = strtok(NULL, ";");
         if (s_id_socio == NULL || s_id_reserva == NULL) {
+            guardar_log(ruta_log, "WARN", "Cancelar reserva: faltan parametros.");
             strcpy(respuesta, "ERROR; Faltan parametros");
             return;
         }
@@ -145,6 +162,9 @@ void procesar_comando(sqlite3 *db, char *buffer, char *respuesta) {
     }
 
     else {
+        char error_log[256];
+        sprintf(error_log, "ALERTA: Comando desconocido intentado por red: '%s'", comando);
+        guardar_log(ruta_log, "WARN", error_log);
         strcpy(respuesta, "ERROR; Comando desconocido");
     }
 }
