@@ -470,21 +470,12 @@ void MenuCliente::menuPerfilConfiguracion()
             datosPersonales();
             break;
 
-<<<<<<< HEAD
         case 2:
         {
             if (socket == nullptr)
             {
                 cout << "Error: Sin conexion con el servidor." << endl;
                 break;
-=======
-                // Empaquetamos la petición con pipes de forma idéntica a tus otros submétodos
-                string comando_editar = "EDITAR_PERFIL; " + to_string(id_socio) + "; " + nuevo_usuario + "; " + nueva_pass + "";
-                socket->enviarMensaje(comando_editar);
-                
-                string respuesta_edit = socket->recibirMensaje();
-                cout << respuesta_edit << endl;
->>>>>>> cambiodiseño2
             }
 
             string nuevo_usuario, nueva_pass;
@@ -494,15 +485,15 @@ void MenuCliente::menuPerfilConfiguracion()
             cout << "Introduce la nueva contrasena (minimo 6 caracteres): ";
             cin >> nueva_pass;
 
-            // Empaquetamos la petición con pipes de forma idéntica a tus otros submétodos
-            string comando_editar = "EDITAR_PERFIL;" + id_socio + ";" + nuevo_usuario + ";" + nueva_pass + "\n";
-            socket->enviarMensaje(comando_editar);
-
-            string respuesta_edit = socket->recibirMensaje();
-            cout << respuesta_edit << endl;
-        }
-        break;
-
+                // Empaquetamos la petición con pipes de forma idéntica a tus otros submétodos
+                string comando_editar = "EDITAR_PERFIL; " + to_string(id_socio) + "; " + nuevo_usuario + "; " + nueva_pass + "";
+                socket->enviarMensaje(comando_editar);
+                
+                string respuesta_edit = socket->recibirMensaje();
+                cout << respuesta_edit << endl;
+            }
+            break;
+            
         case 3:
             estadoSuscripcion();
             break;
@@ -528,11 +519,7 @@ void MenuCliente::datosPersonales()
         return;
     }
 
-<<<<<<< HEAD
-    string comando_ver = "VER_PERFIL;" + id_socio + "\n";
-=======
     string comando_ver = "VER_PERFIL; " + to_string(id_socio) + "";
->>>>>>> cambiodiseño2
     socket->enviarMensaje(comando_ver);
 
     string respuesta = socket->recibirMensaje();
@@ -549,11 +536,7 @@ void MenuCliente::estadoSuscripcion()
         return;
     }
 
-<<<<<<< HEAD
-    string comando = "VER_SUSCRIPCION;" + id_socio + "\n";
-=======
     string comando = "VER_SUSCRIPCION; " + to_string(id_socio) + "";
->>>>>>> cambiodiseño2
     socket->enviarMensaje(comando);
 
     string respuesta = socket->recibirMensaje();
