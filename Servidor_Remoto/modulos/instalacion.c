@@ -13,7 +13,7 @@ void entrar_piscina_db(sqlite3 *db, int id_socio, char *respuesta) {
                       "GROUP BY i.id_instalacion LIMIT 1";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "PISCINA_RESP;ERROR;Error al consultar la base de datos");
+        strcpy(respuesta, "PISCINA_RESP; ERROR; Error al consultar la base de datos");
         return;
     }
 
@@ -23,15 +23,15 @@ void entrar_piscina_db(sqlite3 *db, int id_socio, char *respuesta) {
         sqlite3_finalize(stmt);
 
         if (ocupacion < aforo_maximo) {
-            sprintf(respuesta, "PISCINA_RESP;OK;Acceso permitido. Ocupacion: %d/%d",
+            sprintf(respuesta, "PISCINA_RESP; OK; Acceso permitido. Ocupacion: %d/%d",
                     ocupacion + 1, aforo_maximo);
         } else {
-            sprintf(respuesta, "PISCINA_RESP;ERROR;Aforo completo. Ocupacion: %d/%d",
+            sprintf(respuesta, "PISCINA_RESP; ERROR; Aforo completo. Ocupacion: %d/%d",
                     ocupacion, aforo_maximo);
         }
     } else {
         sqlite3_finalize(stmt);
-        strcpy(respuesta, "PISCINA_RESP;ERROR;No se encontro la piscina");
+        strcpy(respuesta, "PISCINA_RESP; ERROR; No se encontro la piscina");
     }
 }
 
@@ -42,11 +42,11 @@ void listar_instalaciones_db(sqlite3 *db, char *respuesta) {
                       "FROM instalaciones WHERE estado = 'activa'";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "INSTALACIONES_RESP;ERROR;Error al consultar la base de datos");
+        strcpy(respuesta, "INSTALACIONES_RESP; ERROR; Error al consultar la base de datos");
         return;
     }
 
-    strcpy(respuesta, "INSTALACIONES_RESP;OK");
+    strcpy(respuesta, "INSTALACIONES_RESP; OK");
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         int id = sqlite3_column_int(stmt, 0);

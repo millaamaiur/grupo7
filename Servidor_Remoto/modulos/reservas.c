@@ -11,7 +11,7 @@ void mis_reservas_db(sqlite3 *db, int id_socio, char *respuesta) {
                       "WHERE r.id_soc = ? AND r.estado = 'activa'";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "RESERVAS_RESP;ERROR;Error al consultar la base de datos");
+        strcpy(respuesta, "RESERVAS_RESP; ERROR; Error al consultar la base de datos");
         return;
     }
 
@@ -41,7 +41,7 @@ void mis_reservas_db(sqlite3 *db, int id_socio, char *respuesta) {
     }
 
     if (!hay_reservas) {
-        strcpy(respuesta, "RESERVAS_RESP;ERROR;No tienes reservas activas");
+        strcpy(respuesta, "RESERVAS_RESP; ERROR; No tienes reservas activas");
     }
 
     sqlite3_finalize(stmt);
@@ -56,7 +56,7 @@ void crear_reserva_db(sqlite3 *db, int id_socio, int id_instalacion, char *fecha
                             "AND hora_inicio = ? AND estado = 'activa'";
 
     if (sqlite3_prepare_v2(db, sql_check, -1, &stmt_check, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "RESERVA_RESP;ERROR;Error al verificar disponibilidad");
+        strcpy(respuesta, "RESERVA_RESP; ERROR; Error al verificar disponibilidad");
         return;
     }
 
@@ -71,7 +71,7 @@ void crear_reserva_db(sqlite3 *db, int id_socio, int id_instalacion, char *fecha
     sqlite3_finalize(stmt_check);
 
     if (ocupada > 0) {
-        strcpy(respuesta, "RESERVA_RESP;ERROR;La instalacion no esta disponible en ese horario");
+        strcpy(respuesta, "RESERVA_RESP; ERROR; La instalacion no esta disponible en ese horario");
         return;
     }
 
@@ -81,7 +81,7 @@ void crear_reserva_db(sqlite3 *db, int id_socio, int id_instalacion, char *fecha
                       "VALUES (?, ?, ?, ?, ?, 'activa', date('now'))";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "RESERVA_RESP;ERROR;Error al crear la reserva");
+        strcpy(respuesta, "RESERVA_RESP; ERROR; Error al crear la reserva");
         return;
     }
 
@@ -95,9 +95,9 @@ void crear_reserva_db(sqlite3 *db, int id_socio, int id_instalacion, char *fecha
     sqlite3_finalize(stmt);
 
     if (resultado == SQLITE_DONE) {
-        strcpy(respuesta, "RESERVA_RESP;OK;Reserva creada correctamente");
+        strcpy(respuesta, "RESERVA_RESP; OK; Reserva creada correctamente");
     } else {
-        strcpy(respuesta, "RESERVA_RESP;ERROR;No se pudo crear la reserva");
+        strcpy(respuesta, "RESERVA_RESP; ERROR; No se pudo crear la reserva");
     }
 }
 
@@ -108,7 +108,7 @@ void cancelar_reserva_db(sqlite3 *db, int id_socio, int id_reserva, char *respue
                       "WHERE id_reserva = ? AND id_soc = ? AND estado = 'activa'";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "RESERVA_RESP;ERROR;Error al cancelar la reserva");
+        strcpy(respuesta, "RESERVA_RESP; ERROR; Error al cancelar la reserva");
         return;
     }
 
@@ -119,8 +119,8 @@ void cancelar_reserva_db(sqlite3 *db, int id_socio, int id_reserva, char *respue
     sqlite3_finalize(stmt);
 
     if (sqlite3_changes(db) > 0) {
-        strcpy(respuesta, "RESERVA_RESP;OK;Reserva cancelada correctamente");
+        strcpy(respuesta, "RESERVA_RESP; OK; Reserva cancelada correctamente");
     } else {
-        strcpy(respuesta, "RESERVA_RESP;ERROR;No se encontro la reserva o no te pertenece");
+        strcpy(respuesta, "RESERVA_RESP; ERROR; No se encontro la reserva o no te pertenece");
     }
 }

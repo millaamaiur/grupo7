@@ -23,10 +23,10 @@ void MenuCliente::mostrarMenuSocio()
     do
     {
         cout << "\n===== MENU SOCIO =====" << endl;
-        cout << "1. Gestion de reservas" << endl;
-        cout << "2. Servicios del centro" << endl;
-        cout << "3. Perfil y configuracion" << endl;
-        cout << "4. Salir" << endl;
+        cout << "1.- Gestion de reservas" << endl;
+        cout << "2.- Servicios del centro" << endl;
+        cout << "3.- Perfil y configuracion" << endl;
+        cout << "4.- Salir" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
 
@@ -265,9 +265,9 @@ void MenuCliente::menuActividades()
     do
     {
         cout << "\n===== ACTIVIDADES =====" << endl;
-        cout << "1. Consultar actividades disponibles" << endl;
-        cout << "2. Registrarse en una actividad" << endl;
-        cout << "3. Volver" << endl;
+        cout << "1.- Consultar actividades disponibles" << endl;
+        cout << "2.- Registrarse en una actividad" << endl;
+        cout << "3.- Volver" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
 
@@ -304,7 +304,7 @@ void MenuCliente::consultarActividades()
         return;
     }
 
-    socket->enviarMensaje("LISTAR_ACTIVIDADES\n");
+    socket->enviarMensaje("LISTAR_ACTIVIDADES");
 
     string respuesta = socket->recibirMensaje();
 
@@ -326,7 +326,7 @@ void MenuCliente::registrarseActividad()
         return;
     }
 
-    string comando = "INSCRIBIR_ACTIVIDAD;" + id_socio + ";" + idActividad + "\n";
+    string comando = "INSCRIBIR_ACTIVIDAD; " + id_socio + "; " + idActividad + "";
 
     socket->enviarMensaje(comando);
 
@@ -345,9 +345,9 @@ void MenuCliente::menuTaquilla()
     do
     {
         cout << "\n===== GESTION DE TAQUILLA =====" << endl;
-        cout << "1. Consultar taquilla" << endl;
-        cout << "2. Alquilar taquilla" << endl;
-        cout << "3. Volver" << endl;
+        cout << "1.- Consultar taquilla" << endl;
+        cout << "2.- Alquilar taquilla" << endl;
+        cout << "3.- Volver" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
 
@@ -384,7 +384,7 @@ void MenuCliente::consultarTaquilla()
         return;
     }
 
-    string comando = "CONSULTAR_TAQUILLA;" + id_socio + "\n";
+    string comando = "CONSULTAR_TAQUILLA; " + id_socio + "";
 
     socket->enviarMensaje(comando);
 
@@ -404,7 +404,7 @@ void MenuCliente::alquilarTaquilla()
         return;
     }
 
-    string comando = "ALQUILAR_TAQUILLA;" + id_socio + "\n";
+    string comando = "ALQUILAR_TAQUILLA; " + id_socio + "";
 
     socket->enviarMensaje(comando);
 
@@ -426,7 +426,7 @@ void MenuCliente::accesoPiscina()
         return;
     }
 
-    string comando = "ENTRAR_PISCINA;" + id_socio + "\n";
+    string comando = "ENTRAR_PISCINA; " + id_socio + "";
 
     socket->enviarMensaje(comando);
 
@@ -448,10 +448,10 @@ void MenuCliente::menuPerfilConfiguracion()
     do
     {
         cout << "\n===== 3. PERFIL Y CONFIGURACION =====" << endl;
-        cout << "1. Consultar mis datos personales" << endl;
-        cout << "2. Editar mis datos personales (Usuario/Contrasena)" << endl;
-        cout << "3. Consultar el estado de mi suscripcion" << endl;
-        cout << "4. Volver" << endl;
+        cout << "1.- Consultar mis datos personales" << endl;
+        cout << "2.- Editar mis datos personales (Usuario/Contrasena)" << endl;
+        cout << "3.- Consultar el estado de mi suscripcion" << endl;
+        cout << "4.- Volver" << endl;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
 
@@ -470,12 +470,21 @@ void MenuCliente::menuPerfilConfiguracion()
             datosPersonales();
             break;
 
+<<<<<<< HEAD
         case 2:
         {
             if (socket == nullptr)
             {
                 cout << "Error: Sin conexion con el servidor." << endl;
                 break;
+=======
+                // Empaquetamos la petición con pipes de forma idéntica a tus otros submétodos
+                string comando_editar = "EDITAR_PERFIL; " + to_string(id_socio) + "; " + nuevo_usuario + "; " + nueva_pass + "";
+                socket->enviarMensaje(comando_editar);
+                
+                string respuesta_edit = socket->recibirMensaje();
+                cout << respuesta_edit << endl;
+>>>>>>> cambiodiseño2
             }
 
             string nuevo_usuario, nueva_pass;
@@ -519,7 +528,11 @@ void MenuCliente::datosPersonales()
         return;
     }
 
+<<<<<<< HEAD
     string comando_ver = "VER_PERFIL;" + id_socio + "\n";
+=======
+    string comando_ver = "VER_PERFIL; " + to_string(id_socio) + "";
+>>>>>>> cambiodiseño2
     socket->enviarMensaje(comando_ver);
 
     string respuesta = socket->recibirMensaje();
@@ -536,7 +549,11 @@ void MenuCliente::estadoSuscripcion()
         return;
     }
 
+<<<<<<< HEAD
     string comando = "VER_SUSCRIPCION;" + id_socio + "\n";
+=======
+    string comando = "VER_SUSCRIPCION; " + to_string(id_socio) + "";
+>>>>>>> cambiodiseño2
     socket->enviarMensaje(comando);
 
     string respuesta = socket->recibirMensaje();

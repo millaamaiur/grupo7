@@ -8,7 +8,7 @@ void consultar_taquilla_db(sqlite3 *db, int id_socio, char *respuesta) {
                       "FROM taquillas WHERE id_soc = ?";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "TAQUILLA_RESP;ERROR;Error al consultar la base de datos");
+        strcpy(respuesta, "TAQUILLA_RESP; ERROR; Error al consultar la base de datos");
         return;
     }
 
@@ -24,7 +24,7 @@ void consultar_taquilla_db(sqlite3 *db, int id_socio, char *respuesta) {
         sprintf(respuesta, "TAQUILLA_RESP;OK;%d;%s;%s;%s;%s",
                 id, ubicacion, horario, fecha, estado);
     } else {
-        strcpy(respuesta, "TAQUILLA_RESP;ERROR;No tienes taquilla asignada");
+        strcpy(respuesta, "TAQUILLA_RESP; ERROR; No tienes taquilla asignada");
     }
 
     sqlite3_finalize(stmt);
@@ -37,14 +37,14 @@ void alquilar_taquilla_db(sqlite3 *db, int id_socio, char *respuesta) {
     const char *sql_check = "SELECT id_taquilla FROM taquillas WHERE id_soc = ?";
 
     if (sqlite3_prepare_v2(db, sql_check, -1, &stmt_check, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "TAQUILLA_RESP;ERROR;Error al consultar la base de datos");
+        strcpy(respuesta, "TAQUILLA_RESP; ERROR; Error al consultar la base de datos");
         return;
     }
 
     sqlite3_bind_int(stmt_check, 1, id_socio);
 
     if (sqlite3_step(stmt_check) == SQLITE_ROW) {
-        strcpy(respuesta, "TAQUILLA_RESP;ERROR;Ya tienes una taquilla asignada");
+        strcpy(respuesta, "TAQUILLA_RESP; ERROR; Ya tienes una taquilla asignada");
         sqlite3_finalize(stmt_check);
         return;
     }
@@ -55,12 +55,12 @@ void alquilar_taquilla_db(sqlite3 *db, int id_socio, char *respuesta) {
     const char *sql_libre = "SELECT id_taquilla FROM taquillas WHERE estado = 'libre' LIMIT 1";
 
     if (sqlite3_prepare_v2(db, sql_libre, -1, &stmt_libre, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "TAQUILLA_RESP;ERROR;Error al buscar taquilla libre");
+        strcpy(respuesta, "TAQUILLA_RESP; ERROR; Error al buscar taquilla libre");
         return;
     }
 
     if (sqlite3_step(stmt_libre) != SQLITE_ROW) {
-        strcpy(respuesta, "TAQUILLA_RESP;ERROR;No hay taquillas libres disponibles");
+        strcpy(respuesta, "TAQUILLA_RESP; ERROR; No hay taquillas libres disponibles");
         sqlite3_finalize(stmt_libre);
         return;
     }
@@ -74,7 +74,7 @@ void alquilar_taquilla_db(sqlite3 *db, int id_socio, char *respuesta) {
                              "fecha_inicio = date('now') WHERE id_taquilla = ?";
 
     if (sqlite3_prepare_v2(db, sql_update, -1, &stmt_update, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "TAQUILLA_RESP;ERROR;Error al asignar taquilla");
+        strcpy(respuesta, "TAQUILLA_RESP; ERROR; Error al asignar taquilla");
         return;
     }
 
@@ -87,6 +87,6 @@ void alquilar_taquilla_db(sqlite3 *db, int id_socio, char *respuesta) {
     if (resultado == SQLITE_DONE) {
         sprintf(respuesta, "TAQUILLA_RESP;OK;Taquilla %d asignada correctamente", id_taquilla);
     } else {
-        strcpy(respuesta, "TAQUILLA_RESP;ERROR;No se pudo asignar la taquilla");
+        strcpy(respuesta, "TAQUILLA_RESP; ERROR; No se pudo asignar la taquilla");
     }
 }

@@ -9,7 +9,7 @@ void ver_perfil_db(sqlite3 *db, int id_socio, char *respuesta) {
                       "FROM usuarios WHERE id = ?";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "PERFIL_RESP;ERROR;Error al consultar la base de datos");
+        strcpy(respuesta, "PERFIL_RESP; ERROR; Error al consultar la base de datos");
         return;
     }
 
@@ -21,13 +21,13 @@ void ver_perfil_db(sqlite3 *db, int id_socio, char *respuesta) {
         const char *fecha_nac = (const char *)sqlite3_column_text(stmt, 2);
         const char *fecha_alta = (const char *)sqlite3_column_text(stmt, 3);
 
-        sprintf(respuesta, "PERFIL_RESP;OK;%s;%s;%s;%s",
+        sprintf(respuesta, "PERFIL_RESP; OK;%s;%s;%s;%s",
                 user ? user : "N/A",
                 rol ? rol : "N/A",
                 fecha_nac ? fecha_nac : "N/A",
                 fecha_alta ? fecha_alta : "N/A");
     } else {
-        strcpy(respuesta, "PERFIL_RESP;ERROR;Usuario no encontrado");
+        strcpy(respuesta, "PERFIL_RESP; ERROR; Usuario no encontrado");
     }
 
     sqlite3_finalize(stmt);
@@ -42,7 +42,7 @@ void ver_suscripcion_db(sqlite3 *db, int id_socio, char *respuesta) {
                       "WHERE u.id = ?";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "SUSCRIPCION_RESP;ERROR;Error al consultar la base de datos");
+        strcpy(respuesta, "SUSCRIPCION_RESP; ERROR; Error al consultar la base de datos");
         return;
     }
 
@@ -55,7 +55,7 @@ void ver_suscripcion_db(sqlite3 *db, int id_socio, char *respuesta) {
         sprintf(respuesta, "SUSCRIPCION_RESP;OK;%s;%.2f",
                 tipo ? tipo : "N/A", precio);
     } else {
-        strcpy(respuesta, "SUSCRIPCION_RESP;ERROR;No tienes suscripcion asignada");
+        strcpy(respuesta, "SUSCRIPCION_RESP; ERROR; No tienes suscripcion asignada");
     }
 
     sqlite3_finalize(stmt);
@@ -67,7 +67,7 @@ void editar_perfil_db(sqlite3 *db, int id_socio, char *nuevo_usuario, char *nuev
     const char *sql = "UPDATE usuarios SET user = ?, password = ? WHERE id = ?";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        strcpy(respuesta, "PERFIL_RESP;ERROR;Error al actualizar el perfil");
+        strcpy(respuesta, "PERFIL_RESP; ERROR; Error al actualizar el perfil");
         return;
     }
 
@@ -79,8 +79,8 @@ void editar_perfil_db(sqlite3 *db, int id_socio, char *nuevo_usuario, char *nuev
     sqlite3_finalize(stmt);
 
     if (resultado == SQLITE_DONE && sqlite3_changes(db) > 0) {
-        strcpy(respuesta, "PERFIL_RESP;OK;Perfil actualizado correctamente");
+        strcpy(respuesta, "PERFIL_RESP; OK; Perfil actualizado correctamente");
     } else {
-        strcpy(respuesta, "PERFIL_RESP;ERROR;No se pudo actualizar el perfil");
+        strcpy(respuesta, "PERFIL_RESP; ERROR; No se pudo actualizar el perfil");
     }
 }
