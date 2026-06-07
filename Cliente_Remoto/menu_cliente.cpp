@@ -121,7 +121,7 @@ void MenuCliente::consultarDisponibilidad()
     string comando = "CONSULTAR_DISPONIBILIDAD;" +
                      to_string(id_instalacion) + ";" +
                      fecha + ";" +
-                     hora + "\n";
+                     hora;
 
     socket->enviarMensaje(comando);
 
@@ -152,10 +152,10 @@ void MenuCliente::realizarReserva()
 
     string comando = "REALIZAR_RESERVA;" +
                      id_socio + ";" +
-                     to_string(id_instalacion) + "|" +
+                     to_string(id_instalacion) + ";" +
                      fecha + ";" +
                      hora + ";" +
-                     to_string(duracion) + "\n";
+                     to_string(duracion);
 
     socket->enviarMensaje(comando);
 
@@ -173,7 +173,7 @@ void MenuCliente::mostrarReservas()
         return;
     }
 
-    string comando = "MOSTRAR_RESERVAS;" + id_socio + "\n";
+    string comando = "MOSTRAR_RESERVAS;" + id_socio;
 
     socket->enviarMensaje(comando);
 
@@ -197,17 +197,12 @@ void MenuCliente::cancelarReserva()
 
     string comando = "CANCELAR_RESERVA;" +
                      id_socio + ";" +
-                     to_string(id_reserva) + "\n";
+                     to_string(id_reserva);
 
     socket->enviarMensaje(comando);
 
-    
     string respuesta = socket->recibirMensaje();
     cout << respuesta << endl;
-<<<<<<< HEAD
-
-}
-=======
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -326,7 +321,7 @@ void MenuCliente::registrarseActividad()
         return;
     }
 
-    string comando = "INSCRIBIR_ACTIVIDAD; " + id_socio + "; " + idActividad + "";
+    string comando = "INSCRIBIR_ACTIVIDAD; " + id_socio + ";" + idActividad;
 
     socket->enviarMensaje(comando);
 
@@ -384,7 +379,7 @@ void MenuCliente::consultarTaquilla()
         return;
     }
 
-    string comando = "CONSULTAR_TAQUILLA; " + id_socio + "";
+    string comando = "CONSULTAR_TAQUILLA;" + id_socio;
 
     socket->enviarMensaje(comando);
 
@@ -404,7 +399,7 @@ void MenuCliente::alquilarTaquilla()
         return;
     }
 
-    string comando = "ALQUILAR_TAQUILLA; " + id_socio + "";
+    string comando = "ALQUILAR_TAQUILLA;" + id_socio;
 
     socket->enviarMensaje(comando);
 
@@ -426,7 +421,7 @@ void MenuCliente::accesoPiscina()
         return;
     }
 
-    string comando = "ENTRAR_PISCINA; " + id_socio + "";
+    string comando = "ENTRAR_PISCINA;" + id_socio;
 
     socket->enviarMensaje(comando);
 
@@ -485,8 +480,8 @@ void MenuCliente::menuPerfilConfiguracion()
             cout << "Introduce la nueva contrasena (minimo 6 caracteres): ";
             cin >> nueva_pass;
 
-                // Empaquetamos la petición con pipes de forma idéntica a tus otros submétodos
-                string comando_editar = "EDITAR_PERFIL; " + to_string(id_socio) + "; " + nuevo_usuario + "; " + nueva_pass + "";
+                // Empaquetamos la peticion siguiendo el protocolo con separador ;
+                string comando_editar = "EDITAR_PERFIL;" + id_socio + ";" + nuevo_usuario + ";" + nueva_pass;
                 socket->enviarMensaje(comando_editar);
                 
                 string respuesta_edit = socket->recibirMensaje();
@@ -519,7 +514,7 @@ void MenuCliente::datosPersonales()
         return;
     }
 
-    string comando_ver = "VER_PERFIL; " + to_string(id_socio) + "";
+    string comando_ver = "VER_PERFIL;" + id_socio;
     socket->enviarMensaje(comando_ver);
 
     string respuesta = socket->recibirMensaje();
@@ -536,10 +531,9 @@ void MenuCliente::estadoSuscripcion()
         return;
     }
 
-    string comando = "VER_SUSCRIPCION; " + to_string(id_socio) + "";
+    string comando = "VER_SUSCRIPCION;" + id_socio;
     socket->enviarMensaje(comando);
 
     string respuesta = socket->recibirMensaje();
     cout << respuesta << endl;
 }
->>>>>>> origin/main
