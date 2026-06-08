@@ -1,4 +1,4 @@
-#include "cliente_socket.h"
+#include "../include/cliente_socket.h"
 
 #include <iostream>
 #include <ws2tcpip.h>

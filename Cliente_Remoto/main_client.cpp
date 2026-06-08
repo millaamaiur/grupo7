@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string>
 
-#include "menu_cliente.h"
-#include "cliente_socket.h"
+#include "include/menu_cliente.h"
+#include "include/cliente_socket.h"
 
 using namespace std;
 
@@ -11,7 +11,7 @@ int main(void)
 
     // Crear socket del cliente
     // pongo ip y puerto local
-    ClienteSocket socket("127.0.0.1", 5000);
+    ClienteSocket socket("127.0.0.1", 8080);
 
     // Conectarse al servidor
     // Usamos metodo de la clase cliente_socket

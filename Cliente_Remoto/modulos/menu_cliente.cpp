@@ -1,5 +1,5 @@
 #include <iostream>
-#include "menu_cliente.h"
+#include "../include/menu_cliente.h"
 #include <string>
 
 using namespace std;
@@ -8,12 +8,18 @@ MenuCliente::MenuCliente()
 {
     this->socket = nullptr;
     this->id_socio = "";
+    this->cache_perfil_valida = false;
+    this->cache_suscripcion_valida = false;
+    this->cache_actividades_valida = false;
 }
 
 MenuCliente::MenuCliente(ClienteSocket *socket, string id_socio)
 {
     this->socket = socket;
     this->id_socio = id_socio;
+    this->cache_perfil_valida = false;
+    this->cache_suscripcion_valida = false;
+    this->cache_actividades_valida = false;
 }
 
 void MenuCliente::mostrarMenuSocio()
@@ -58,7 +64,6 @@ void MenuCliente::mostrarMenuSocio()
 
 //// CASO 1: GESTION DE RESERVAS ////
 
-// MENU DE RESERVAS
 void MenuCliente::menuGestionReservas()
 {
     int opcion;
@@ -124,10 +129,10 @@ void MenuCliente::consultarDisponibilidad()
                      hora;
 
     socket->enviarMensaje(comando);
-
     string respuesta = socket->recibirMensaje();
     cout << respuesta << endl;
 }
+
 void MenuCliente::realizarReserva()
 {
     int id_instalacion;
@@ -150,7 +155,7 @@ void MenuCliente::realizarReserva()
         return;
     }
 
-    string comando = "REALIZAR_RESERVA;" +
+    string comando = "RESERVAR;" +
                      id_socio + ";" +
                      to_string(id_instalacion) + ";" +
                      fecha + ";" +
@@ -158,7 +163,6 @@ void MenuCliente::realizarReserva()
                      to_string(duracion);
 
     socket->enviarMensaje(comando);
-
     string respuesta = socket->recibirMensaje();
     cout << respuesta << endl;
 }
@@ -173,10 +177,8 @@ void MenuCliente::mostrarReservas()
         return;
     }
 
-    string comando = "MOSTRAR_RESERVAS;" + id_socio;
-
+    string comando = "MIS_RESERVAS;" + id_socio;
     socket->enviarMensaje(comando);
-
     string respuesta = socket->recibirMensaje();
     cout << respuesta << endl;
 }
@@ -200,7 +202,6 @@ void MenuCliente::cancelarReserva()
                      to_string(id_reserva);
 
     socket->enviarMensaje(comando);
-
     string respuesta = socket->recibirMensaje();
     cout << respuesta << endl;
 }
@@ -211,7 +212,6 @@ void MenuCliente::cancelarReserva()
 
 //// CASO 2: SERVICIOS DEL CENTRO ////
 
-// MENU DE SERVICIOS DEL CENTRO
 void MenuCliente::menuServiciosCentro()
 {
     int opcion;
@@ -231,19 +231,15 @@ void MenuCliente::menuServiciosCentro()
         case 1:
             menuActividades();
             break;
-
         case 2:
             menuTaquilla();
             break;
-
         case 3:
             accesoPiscina();
             break;
-
         case 4:
             cout << "Volviendo al menu de socio..." << endl;
             break;
-
         default:
             cout << "Opcion no valida." << endl;
             break;
@@ -252,7 +248,6 @@ void MenuCliente::menuServiciosCentro()
     } while (opcion != 4);
 }
 
-// submenu de actividades
 void MenuCliente::menuActividades()
 {
     int opcion;
@@ -271,15 +266,12 @@ void MenuCliente::menuActividades()
         case 1:
             consultarActividades();
             break;
-
         case 2:
             registrarseActividad();
             break;
-
         case 3:
             cout << "Volviendo a servicios del centro..." << endl;
             break;
-
         default:
             cout << "Opcion no valida." << endl;
             break;
@@ -288,7 +280,6 @@ void MenuCliente::menuActividades()
     } while (opcion != 3);
 }
 
-// opcion -> consultar actividades
 void MenuCliente::consultarActividades()
 {
     cout << "\n--- CONSULTAR ACTIVIDADES ---" << endl;
@@ -299,14 +290,23 @@ void MenuCliente::consultarActividades()
         return;
     }
 
-    socket->enviarMensaje("LISTAR_ACTIVIDADES");
+    // Si la cache es valida, mostrar sin pedir al servidor
+    if (cache_actividades_valida)
+    {
+        cout << "[cache] " << cache_actividades << endl;
+        return;
+    }
 
+    socket->enviarMensaje("LISTAR_ACTIVIDADES");
     string respuesta = socket->recibirMensaje();
+
+    // Guardar en cache
+    cache_actividades = respuesta;
+    cache_actividades_valida = true;
 
     cout << respuesta << endl;
 }
 
-// opcion -> registrarse actividad
 void MenuCliente::registrarseActividad()
 {
     string idActividad;
@@ -321,18 +321,16 @@ void MenuCliente::registrarseActividad()
         return;
     }
 
-    string comando = "INSCRIBIR_ACTIVIDAD; " + id_socio + ";" + idActividad;
-
+    string comando = "INSCRIBIR_ACTIVIDAD;" + id_socio + ";" + idActividad;
     socket->enviarMensaje(comando);
-
     string respuesta = socket->recibirMensaje();
+
+    // Invalidar cache de actividades por si cambio el aforo
+    cache_actividades_valida = false;
 
     cout << respuesta << endl;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-
-// submenu de taquillas
 void MenuCliente::menuTaquilla()
 {
     int opcion;
@@ -351,15 +349,12 @@ void MenuCliente::menuTaquilla()
         case 1:
             consultarTaquilla();
             break;
-
         case 2:
             alquilarTaquilla();
             break;
-
         case 3:
             cout << "Volviendo a servicios del centro..." << endl;
             break;
-
         default:
             cout << "Opcion no valida." << endl;
             break;
@@ -368,7 +363,6 @@ void MenuCliente::menuTaquilla()
     } while (opcion != 3);
 }
 
-// opcion -> consultar taquillla
 void MenuCliente::consultarTaquilla()
 {
     cout << "\n--- CONSULTAR TAQUILLA ---" << endl;
@@ -380,15 +374,11 @@ void MenuCliente::consultarTaquilla()
     }
 
     string comando = "CONSULTAR_TAQUILLA;" + id_socio;
-
     socket->enviarMensaje(comando);
-
     string respuesta = socket->recibirMensaje();
-
     cout << respuesta << endl;
 }
 
-// opcion -> alquilar taquilla
 void MenuCliente::alquilarTaquilla()
 {
     cout << "\n--- ALQUILAR TAQUILLA ---" << endl;
@@ -400,17 +390,11 @@ void MenuCliente::alquilarTaquilla()
     }
 
     string comando = "ALQUILAR_TAQUILLA;" + id_socio;
-
     socket->enviarMensaje(comando);
-
     string respuesta = socket->recibirMensaje();
-
     cout << respuesta << endl;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-
-// SUBMENU DE PISCINA
 void MenuCliente::accesoPiscina()
 {
     cout << "\n--- ACCESO PISCINA ---" << endl;
@@ -422,11 +406,8 @@ void MenuCliente::accesoPiscina()
     }
 
     string comando = "ENTRAR_PISCINA;" + id_socio;
-
     socket->enviarMensaje(comando);
-
     string respuesta = socket->recibirMensaje();
-
     cout << respuesta << endl;
 }
 
@@ -436,7 +417,6 @@ void MenuCliente::accesoPiscina()
 
 //// CASO 3: PERFIL DE CONFIGURACION ////
 
-// MENU DE PERFIL Y CONFIGURACION
 void MenuCliente::menuPerfilConfiguracion()
 {
     int opcion;
@@ -450,7 +430,6 @@ void MenuCliente::menuPerfilConfiguracion()
         cout << "Seleccione una opcion: ";
         cin >> opcion;
 
-        // Limpieza de filtro por si el usuario introduce letras por error
         if (cin.fail())
         {
             cin.clear();
@@ -480,15 +459,16 @@ void MenuCliente::menuPerfilConfiguracion()
             cout << "Introduce la nueva contrasena (minimo 6 caracteres): ";
             cin >> nueva_pass;
 
-                // Empaquetamos la peticion siguiendo el protocolo con separador ;
-                string comando_editar = "EDITAR_PERFIL;" + id_socio + ";" + nuevo_usuario + ";" + nueva_pass;
-                socket->enviarMensaje(comando_editar);
-                
-                string respuesta_edit = socket->recibirMensaje();
-                cout << respuesta_edit << endl;
-            }
+            string comando_editar = "EDITAR_PERFIL;" + id_socio + ";" + nuevo_usuario + ";" + nueva_pass;
+            socket->enviarMensaje(comando_editar);
+            string respuesta_edit = socket->recibirMensaje();
+            cout << respuesta_edit << endl;
+
+            // Invalidar cache de perfil porque los datos han cambiado
+            cache_perfil_valida = false;
             break;
-            
+        }
+
         case 3:
             estadoSuscripcion();
             break;
@@ -514,10 +494,21 @@ void MenuCliente::datosPersonales()
         return;
     }
 
+    // Si la cache es valida, mostrar sin pedir al servidor
+    if (cache_perfil_valida)
+    {
+        cout << "[cache] " << cache_perfil << endl;
+        return;
+    }
+
     string comando_ver = "VER_PERFIL;" + id_socio;
     socket->enviarMensaje(comando_ver);
-
     string respuesta = socket->recibirMensaje();
+
+    // Guardar en cache
+    cache_perfil = respuesta;
+    cache_perfil_valida = true;
+
     cout << respuesta << endl;
 }
 
@@ -531,9 +522,20 @@ void MenuCliente::estadoSuscripcion()
         return;
     }
 
+    // Si la cache es valida, mostrar sin pedir al servidor
+    if (cache_suscripcion_valida)
+    {
+        cout << "[cache] " << cache_suscripcion << endl;
+        return;
+    }
+
     string comando = "VER_SUSCRIPCION;" + id_socio;
     socket->enviarMensaje(comando);
-
     string respuesta = socket->recibirMensaje();
+
+    // Guardar en cache
+    cache_suscripcion = respuesta;
+    cache_suscripcion_valida = true;
+
     cout << respuesta << endl;
 }

@@ -7,4 +7,4 @@ void consultar_actividades_db(sqlite3 *db, char *resultado);
 
 void registrarse_actividad_db(sqlite3 *db, int id_socio, int id_actividad, char *respuesta);
 
-#endif ACTIVIDADES_H
+#endif

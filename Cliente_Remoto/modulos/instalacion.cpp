@@ -1,4 +1,4 @@
-#include "../include/Instalacion.h"
+#include "../include/instalacion.h"
 #include <iostream>
 #include <cstring>
 

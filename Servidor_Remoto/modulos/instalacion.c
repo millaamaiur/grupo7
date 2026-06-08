@@ -63,3 +63,33 @@ void listar_instalaciones_db(sqlite3 *db, char *respuesta) {
 
     sqlite3_finalize(stmt);
 }
+
+void consultar_disponibilidad_db(sqlite3 *db, int id_instalacion, char *fecha, char *hora_inicio, char *respuesta) {
+    sqlite3_stmt *stmt;
+
+    const char *sql = "SELECT COUNT(*) FROM reservas "
+                      "WHERE id_instalacion = ? AND fecha = ? "
+                      "AND hora_inicio = ? AND estado = 'activa'";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        strcpy(respuesta, "DISPONIBILIDAD_RESP; ERROR; Error al consultar la base de datos");
+        return;
+    }
+
+    sqlite3_bind_int(stmt, 1, id_instalacion);
+    sqlite3_bind_text(stmt, 2, fecha, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, hora_inicio, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        int ocupada = sqlite3_column_int(stmt, 0);
+        sqlite3_finalize(stmt);
+        if (ocupada > 0) {
+            strcpy(respuesta, "DISPONIBILIDAD_RESP; ERROR; Instalacion no disponible en ese horario");
+        } else {
+            strcpy(respuesta, "DISPONIBILIDAD_RESP; OK; Instalacion disponible");
+        }
+    } else {
+        sqlite3_finalize(stmt);
+        strcpy(respuesta, "DISPONIBILIDAD_RESP; ERROR; Error al consultar");
+    }
+}

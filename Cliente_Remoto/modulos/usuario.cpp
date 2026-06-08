@@ -1,4 +1,4 @@
-#include "../include/Usuario.h"
+#include "../include/usuario.h"
 #include <iostream>
 #include <cstring>
 

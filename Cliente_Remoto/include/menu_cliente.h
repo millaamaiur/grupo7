@@ -12,6 +12,16 @@ private:
     ClienteSocket* socket;
     string id_socio;
 
+    // Cache
+    string cache_perfil;
+    bool cache_perfil_valida;
+
+    string cache_suscripcion;
+    bool cache_suscripcion_valida;
+
+    string cache_actividades;
+    bool cache_actividades_valida;
+
     void menuGestionReservas();
     void menuServiciosCentro();
     void menuPerfilConfiguracion();

@@ -1,4 +1,4 @@
-#include "../include/Reserva.h"
+#include "../include/reserva.h"
 #include <iostream>
 #include <cstring>
 

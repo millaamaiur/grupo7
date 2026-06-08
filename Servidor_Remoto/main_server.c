@@ -14,7 +14,7 @@
 int main(void)
 {
     // 1. Config y base de datos
-    Config cfg = load_config("config/servidor.conf");
+    Config cfg = load_config("ficherosTexto/confic.txt");;
     sqlite3 *db = db_open(cfg.db_path);
     if (db == NULL) {
         printf("Error al abrir la base de datos\n");

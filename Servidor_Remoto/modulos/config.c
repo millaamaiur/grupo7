@@ -1,6 +1,7 @@
 #include "../include/config.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 Config load_config(const char *path) {
     Config config = {0};
