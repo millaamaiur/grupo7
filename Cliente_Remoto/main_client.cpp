@@ -69,11 +69,8 @@ int main(void)
     }
     else if (respuesta.substr(0, 8) == "OK_ADMIN")
     {
-        string idTexto = respuesta.substr(9);
-
-        cout << "Login correcto como administrador. ID: " << idTexto << endl;
-
-        cout << "Menu administrador pendiente." << endl;
+        cout << "Este cliente es solo para socios." << endl;
+        cout << "Para acceder como administrador, utilice el programa de administracion local." << endl;
     }
     else if (respuesta.substr(0, 5) == "ERROR")
     {
