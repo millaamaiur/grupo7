@@ -42,12 +42,15 @@ void MenuCliente::mostrarMenuSocio()
         switch (opcion)
         {
         case 1:
+            system("cls");
             menuGestionReservas();
             break;
         case 2:
+            system("cls");
             menuServiciosCentro();
             break;
         case 3:
+            system("cls");
             menuPerfilConfiguracion();
             break;
         case 4:
@@ -69,10 +72,12 @@ void MenuCliente::mostrarMenuSocio()
 
 void MenuCliente::menuGestionReservas()
 {
+    
     int opcion;
-
+    
     do
     {
+        
         cout << "\n===== GESTION DE RESERVAS =====" << endl;
         cout << "1. Consultar disponibilidad" << endl;
         cout << "2. Realizar reserva" << endl;
@@ -273,6 +278,7 @@ void MenuCliente::menuServiciosCentro()
 
     do
     {
+        
         cout << "\n===== SERVICIOS DEL CENTRO =====" << endl;
         cout << "1. Actividades" << endl;
         cout << "2. Taquilla" << endl;
@@ -309,6 +315,7 @@ void MenuCliente::menuActividades()
 
     do
     {
+        
         cout << "\n===== ACTIVIDADES =====" << endl;
         cout << "1.- Consultar actividades disponibles" << endl;
         cout << "2.- Registrarse en una actividad" << endl;
@@ -392,6 +399,7 @@ void MenuCliente::menuTaquilla()
 
     do
     {
+        
         cout << "\n===== GESTION DE TAQUILLA =====" << endl;
         cout << "1.- Consultar taquilla" << endl;
         cout << "2.- Alquilar taquilla" << endl;
@@ -477,6 +485,7 @@ void MenuCliente::menuPerfilConfiguracion()
     int opcion;
     do
     {
+        
         cout << "\n===== 3. PERFIL Y CONFIGURACION =====" << endl;
         cout << "1.- Consultar mis datos personales" << endl;
         cout << "2.- Editar mis datos personales (Usuario/Contrasena)" << endl;
@@ -497,6 +506,7 @@ void MenuCliente::menuPerfilConfiguracion()
         {
         case 1:
             datosPersonales();
+            
             break;
 
         case 2:
@@ -526,6 +536,7 @@ void MenuCliente::menuPerfilConfiguracion()
 
         case 3:
             estadoSuscripcion();
+            
             break;
 
         case 4:
