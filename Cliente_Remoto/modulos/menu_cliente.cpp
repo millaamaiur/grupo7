@@ -112,9 +112,15 @@ void MenuCliente::menuGestionReservas()
     } while (opcion != 5);
 }
 
-void MenuCliente::consultarActividades()
+#include <sstream>
+#include <vector>
+#include <iomanip>
+
+void MenuCliente::consultarDisponibilidad()
 {
-    cout << "\n--- CONSULTAR ACTIVIDADES ---\n";
+    cout << "\n=====================================================\n";
+    cout << "           INSTALACIONES DISPONIBLES\n";
+    cout << "=====================================================\n";
 
     if (socket == nullptr)
     {
@@ -122,57 +128,54 @@ void MenuCliente::consultarActividades()
         return;
     }
 
-    socket->enviarMensaje("ACTIVIDADES");
+    socket->enviarMensaje("CONSULTAR_DISPONIBILIDAD");
 
     string respuesta = socket->recibirMensaje();
 
-    if (respuesta.find("ACTIVIDADES_RESP; OK;") == string::npos)
+    if (respuesta.find("DISPONIBILIDAD_RESP") == string::npos)
     {
         cout << respuesta << endl;
         return;
     }
 
-    cout << "+----+----------------------+-----+------+----------+---------------+\n";
-    cout << "| ID | Actividad            | Dia | Hora | Duracion | Participantes |\n";
-    cout << "+----+----------------------+-----+------+----------+---------------+\n";
+    cout << "+----+----------------------+------------+\n";
+    cout << "| ID | Instalacion          | Estado     |\n";
+    cout << "+----+----------------------+------------+\n";
 
-    string datos = respuesta.substr(respuesta.find("; OK;") + 5);
+    size_t pos = respuesta.find(";OK;");
+    string datos = respuesta.substr(pos + 4);
 
-    size_t inicio = 0;
-
-    while ((inicio = datos.find('[')) != string::npos)
+    while (true)
     {
+        size_t inicio = datos.find('[');
         size_t fin = datos.find(']');
 
-        if (fin == string::npos)
+        if (inicio == string::npos || fin == string::npos)
             break;
 
-        string actividad = datos.substr(inicio + 1, fin - inicio - 1);
+        string instalacion = datos.substr(inicio + 1, fin - inicio - 1);
 
         vector<string> campos;
         string campo;
-        stringstream ss(actividad);
+        stringstream ss(instalacion);
 
-        while (getline(ss, campo, ','))
+        while (getline(ss, campo, ';'))
         {
             campos.push_back(campo);
         }
 
-        if (campos.size() >= 6)
+        if (campos.size() >= 3)
         {
             cout << "| "
-                 << setw(2) << left << campos[0] << " | "
+                 << setw(2)  << left << campos[0] << " | "
                  << setw(20) << left << campos[1] << " | "
-                 << setw(3) << left << campos[2] << " | "
-                 << setw(4) << left << campos[3] << " | "
-                 << setw(8) << left << campos[4] << " | "
-                 << setw(13) << left << campos[5] << " |\n";
+                 << setw(10) << left << campos[2] << " |\n";
         }
 
         datos = datos.substr(fin + 1);
     }
 
-    cout << "+----+----------------------+-----+------+----------+---------------+\n";
+    cout << "+----+----------------------+------------+\n";
 }
 
 void MenuCliente::realizarReserva()

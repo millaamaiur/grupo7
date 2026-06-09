@@ -93,3 +93,15 @@
 [2026-06-09 20:51:20] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
 [2026-06-09 20:51:20] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
 [2026-06-09 20:51:31] [INFO] Peticion recibida: LISTAR_ACTIVIDADES
+[2026-06-09 20:54:52] [INFO] Servidor escuchando correctamente.
+[2026-06-09 20:56:08] [INFO] Servidor escuchando correctamente.
+[2026-06-09 20:58:08] [INFO] Cliente conectado
+[2026-06-09 20:58:15] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 20:58:15] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 20:58:22] [INFO] Peticion recibida: CONSULTAR_TAQUILLA;3
+[2026-06-09 20:58:27] [INFO] Peticion recibida: ALQUILAR_TAQUILLA;3
+[2026-06-09 20:58:33] [INFO] Peticion recibida: ENTRAR_PISCINA;3
+[2026-06-09 20:58:37] [INFO] Peticion recibida: ENTRAR_PISCINA;3
+[2026-06-09 20:58:42] [INFO] Peticion recibida: LISTAR_ACTIVIDADES
+[2026-06-09 20:58:57] [INFO] Peticion recibida: VER_PERFIL;3
+[2026-06-09 20:59:11] [INFO] Peticion recibida: VER_SUSCRIPCION;3
