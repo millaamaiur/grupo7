@@ -82,3 +82,7 @@
 [2026-06-09 20:34:52] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
 [2026-06-09 20:34:55] [INFO] Peticion recibida: MIS_RESERVAS;3
 [2026-06-09 20:35:04] [INFO] Cliente desconectado
+[2026-06-09 20:37:02] [INFO] Cliente conectado
+[2026-06-09 20:37:08] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 20:37:08] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 20:37:39] [INFO] Peticion recibida: LISTAR_ACTIVIDADES
