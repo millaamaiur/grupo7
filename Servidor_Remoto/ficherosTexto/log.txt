@@ -138,3 +138,38 @@
 [2026-06-09 21:11:02] [INFO] Peticion recibida: VER_PERFIL;3
 [2026-06-09 21:11:05] [INFO] Peticion recibida: VER_SUSCRIPCION;3
 [2026-06-09 21:11:10] [INFO] Cliente desconectado
+[2026-06-09 22:05:14] [INFO] Servidor escuchando correctamente.
+[2026-06-09 22:05:25] [INFO] Cliente conectado
+[2026-06-09 22:05:44] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 22:05:44] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 22:05:49] [INFO] Peticion recibida: CONSULTAR_DISPONIBILIDAD
+[2026-06-09 22:05:56] [INFO] Peticion recibida: CONSULTAR_DISPONIBILIDAD
+[2026-06-09 22:06:24] [INFO] Peticion recibida: RESERVAR;3;1;2026-06-09;21:12;35
+[2026-06-09 22:06:29] [INFO] Peticion recibida: MIS_RESERVAS;3
+[2026-06-09 22:06:36] [INFO] Peticion recibida: CANCELAR_RESERVA;3;1
+[2026-06-09 22:06:50] [INFO] Peticion recibida: CANCELAR_RESERVA;3;22
+[2026-06-09 22:06:53] [INFO] Peticion recibida: MIS_RESERVAS;3
+[2026-06-09 22:07:11] [INFO] Peticion recibida: LISTAR_ACTIVIDADES
+[2026-06-09 22:07:16] [INFO] Peticion recibida: INSCRIBIR_ACTIVIDAD;3;1
+[2026-06-09 22:07:22] [INFO] Peticion recibida: LISTAR_ACTIVIDADES
+[2026-06-09 22:07:33] [INFO] Peticion recibida: CONSULTAR_TAQUILLA;3
+[2026-06-09 22:07:39] [INFO] Peticion recibida: ALQUILAR_TAQUILLA;3
+[2026-06-09 22:07:45] [INFO] Peticion recibida: ENTRAR_PISCINA;3
+[2026-06-09 22:08:58] [INFO] Peticion recibida: ENTRAR_PISCINA;3
+[2026-06-09 22:09:04] [INFO] Peticion recibida: VER_PERFIL;3
+[2026-06-09 22:09:16] [INFO] Peticion recibida: EDITAR_PERFIL;3;maria_fernanda;123456
+[2026-06-09 22:09:20] [INFO] Peticion recibida: VER_SUSCRIPCION;3
+[2026-06-09 22:09:28] [INFO] Peticion recibida: CONSULTAR_DISPONIBILIDAD
+[2026-06-09 22:15:57] [INFO] Servidor escuchando correctamente.
+[2026-06-09 22:16:01] [INFO] Cliente conectado
+[2026-06-09 22:16:12] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 22:16:12] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 22:16:16] [INFO] Peticion recibida: LISTAR_INSTALACIONES
+[2026-06-09 22:16:16] [WARN] ALERTA: Comando desconocido intentado por red: 'LISTAR_INSTALACIONES'
+[2026-06-09 22:17:46] [INFO] Cliente desconectado
+[2026-06-09 22:18:07] [INFO] Servidor escuchando correctamente.
+[2026-06-09 22:18:19] [INFO] Cliente conectado
+[2026-06-09 22:18:27] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 22:18:27] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 22:18:30] [INFO] Peticion recibida: LISTAR_INSTALACIONES
+[2026-06-09 22:18:35] [INFO] Cliente desconectado

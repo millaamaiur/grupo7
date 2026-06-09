@@ -128,11 +128,11 @@ void MenuCliente::consultarDisponibilidad()
         return;
     }
 
-    socket->enviarMensaje("CONSULTAR_DISPONIBILIDAD");
+    socket->enviarMensaje("LISTAR_INSTALACIONES");
 
     string respuesta = socket->recibirMensaje();
 
-    if (respuesta.find("DISPONIBILIDAD_RESP") == string::npos)
+    if (respuesta.find("INSTALACIONES_RESP") == string::npos)
     {
         cout << respuesta << endl;
         return;

@@ -73,6 +73,12 @@ void procesar_comando(sqlite3 *db, char *buffer, char *respuesta, const char *ru
         consultar_actividades_db(db, respuesta);
     }
 
+    // LISTAR_INSTALACIONES
+    else if (strcmp(comando, "LISTAR_INSTALACIONES") == 0)
+    {
+        listar_instalaciones_db(db, respuesta);
+    }
+
     // INSCRIBIR_ACTIVIDAD;id_socio;id_actividad
     else if (strcmp(comando, "INSCRIBIR_ACTIVIDAD") == 0)
     {
