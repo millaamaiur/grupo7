@@ -1,6 +1,7 @@
 #include "../include/reserva.h"
 #include <iostream>
 #include <cstring>
+#include <iomanip>
 
 using namespace std;
 
@@ -181,12 +182,19 @@ bool Reserva::estaCancelada() const
 
 void Reserva::mostrar() const
 {
-    cout << "ID reserva: " << this->id_reserva << endl;
-    cout << "ID socio: " << this->id_soc << endl;
-    cout << "ID instalacion: " << this->id_instalacion << endl;
-    cout << "Nombre instalacion: " << this->nombre_instalacion << endl;
-    cout << "Fecha: " << this->fecha << endl;
-    cout << "Hora inicio: " << this->hora_inicio << endl;
-    cout << "Duracion: " << this->duracion << " minutos" << endl;
-    cout << "Estado: " << this->estado << endl;
+    cout << "+------------+----------+-----------------+----------------------+------------+--------------+----------+------------+\n";
+    cout << "| ID Reserva | ID Socio | ID Instalacion  | Nombre Instalacion   | Fecha      | Hora Inicio  | Duracion | Estado     |\n";
+    cout << "+------------+----------+-----------------+----------------------+------------+--------------+----------+------------+\n";
+
+    cout << "| "
+         << setw(10) << left << this->id_reserva << " | "
+         << setw(8) << left << this->id_soc << " | "
+         << setw(15) << left << this->id_instalacion << " | "
+         << setw(20) << left << this->nombre_instalacion << " | "
+         << setw(10) << left << this->fecha << " | "
+         << setw(12) << left << this->hora_inicio << " | "
+         << setw(8) << left << this->duracion << " | "
+         << setw(10) << left << this->estado << " |\n";
+
+    cout << "+------------+----------+-----------------+----------------------+------------+--------------+----------+------------+\n";
 }

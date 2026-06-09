@@ -35,3 +35,36 @@
 [2026-06-08 12:37:10] [INFO] Peticion recibida: LOGIN;admin;1234
 [2026-06-08 12:37:10] [INFO] LOGIN EXITOSO: Administrador ID 1 autenticado.
 [2026-06-08 12:37:10] [INFO] Cliente desconectado
+[2026-06-09 20:11:53] [INFO] Servidor escuchando correctamente.
+[2026-06-09 20:12:26] [INFO] Cliente conectado
+[2026-06-09 20:12:31] [INFO] Peticion recibida: LOGIN;admin;1234
+[2026-06-09 20:12:31] [INFO] LOGIN EXITOSO: Administrador ID 1 autenticado.
+[2026-06-09 20:12:31] [INFO] Cliente desconectado
+[2026-06-09 20:12:38] [INFO] Cliente conectado
+[2026-06-09 20:13:25] [INFO] Peticion recibida: LOGIN;carlos_ruiz;1234
+[2026-06-09 20:13:25] [INFO] LOGIN EXITOSO: Socio ID 6 autenticado.
+[2026-06-09 20:13:34] [INFO] Peticion recibida: MIS_RESERVAS;6
+[2026-06-09 20:14:16] [INFO] Cliente desconectado
+[2026-06-09 20:14:18] [INFO] Cliente conectado
+[2026-06-09 20:14:42] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 20:14:42] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 20:14:47] [INFO] Peticion recibida: MIS_RESERVAS;3
+[2026-06-09 20:18:39] [INFO] Cliente desconectado
+[2026-06-09 20:18:48] [INFO] Cliente conectado
+[2026-06-09 20:18:56] [INFO] Peticion recibida: LOGIN;claudia_fernandez;123456
+[2026-06-09 20:18:56] [WARN] Intento de LOGIN denegado para usuario: 'claudia_fernandez'.
+[2026-06-09 20:18:56] [INFO] Cliente desconectado
+[2026-06-09 20:19:04] [INFO] Cliente conectado
+[2026-06-09 20:19:13] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 20:19:13] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 20:19:17] [INFO] Peticion recibida: MIS_RESERVAS;3
+[2026-06-09 20:19:27] [INFO] Cliente desconectado
+[2026-06-09 20:19:36] [INFO] Servidor escuchando correctamente.
+[2026-06-09 20:22:05] [INFO] Cliente conectado
+[2026-06-09 20:22:12] [INFO] Peticion recibida: LOGIN;maria_fernada;123456
+[2026-06-09 20:22:12] [WARN] Intento de LOGIN denegado para usuario: 'maria_fernada'.
+[2026-06-09 20:22:12] [INFO] Cliente desconectado
+[2026-06-09 20:22:15] [INFO] Cliente conectado
+[2026-06-09 20:22:26] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 20:22:26] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 20:22:32] [INFO] Peticion recibida: MIS_RESERVAS;3

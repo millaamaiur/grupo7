@@ -1,6 +1,9 @@
 #include <iostream>
 #include "../include/menu_cliente.h"
 #include <string>
+#include <iomanip>
+#include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -169,18 +172,70 @@ void MenuCliente::realizarReserva()
 
 void MenuCliente::mostrarReservas()
 {
-    cout << "\n--- MIS RESERVAS ---" << endl;
+    cout << "\n=============================================================\n";
+    cout << "                     MIS RESERVAS\n";
+    cout << "=============================================================\n";
 
     if (socket == nullptr)
     {
-        cout << "No hay conexion con el servidor." << endl;
+        cout << "No hay conexion con el servidor.\n";
         return;
     }
 
     string comando = "MIS_RESERVAS;" + id_socio;
+
     socket->enviarMensaje(comando);
+
     string respuesta = socket->recibirMensaje();
-    cout << respuesta << endl;
+
+    if (respuesta.find("RESERVAS_RESP;OK;") == string::npos)
+    {
+        cout << respuesta << endl;
+        return;
+    }
+
+    cout << "+-----+----------------------+------------+--------+----------+----------+\n";
+    cout << "| ID  | Instalacion          | Fecha      | Hora   | Duracion | Estado   |\n";
+    cout << "+-----+----------------------+------------+--------+----------+----------+\n";
+
+    size_t pos = respuesta.find(";OK;");
+    string datos = respuesta.substr(pos + 4);
+
+    size_t inicio = 0;
+
+    while ((inicio = datos.find('[')) != string::npos)
+    {
+        size_t fin = datos.find(']');
+
+        if (fin == string::npos)
+            break;
+
+        string reserva = datos.substr(inicio + 1, fin - inicio - 1);
+
+        vector<string> campos;
+        string campo;
+        stringstream ss(reserva);
+
+        while (getline(ss, campo, ';'))
+        {
+            campos.push_back(campo);
+        }
+
+        if (campos.size() >= 6)
+        {
+            cout << "| "
+                 << setw(3)  << left << campos[0] << " | "
+                 << setw(20) << left << campos[1] << " | "
+                 << setw(10) << left << campos[2] << " | "
+                 << setw(6)  << left << campos[3] << " | "
+                 << setw(8)  << left << campos[4] << " | "
+                 << setw(8)  << left << campos[5] << " |\n";
+        }
+
+        datos = datos.substr(fin + 1);
+    }
+
+    cout << "+-----+----------------------+------------+--------+----------+----------+\n";
 }
 
 void MenuCliente::cancelarReserva()
