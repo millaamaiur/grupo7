@@ -86,3 +86,4 @@
 [2026-06-09 20:37:08] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
 [2026-06-09 20:37:08] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
 [2026-06-09 20:37:39] [INFO] Peticion recibida: LISTAR_ACTIVIDADES
+[2026-06-09 20:44:50] [INFO] Peticion recibida: CONSULTAR_TAQUILLA;3
