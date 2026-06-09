@@ -9,7 +9,6 @@
 #include "sqlite3.h"
 #include "include/taquilla.h"
 #include "include/usuario.h"
-#include "include/utilidades.h"
 
 int main(void)
 {
