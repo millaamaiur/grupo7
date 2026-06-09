@@ -690,56 +690,111 @@ void MenuCliente::menuPerfilConfiguracion()
 
 void MenuCliente::datosPersonales()
 {
-    cout << "\n--- CONSULTAR DATOS PERSONALES ---" << endl;
+    cout << "\n=================================================\n";
+    cout << "              MIS DATOS PERSONALES\n";
+    cout << "=================================================\n";
 
     if (socket == nullptr)
     {
-        cout << "No hay conexion con el servidor." << endl;
+        cout << "No hay conexion con el servidor.\n";
         return;
     }
 
-    // Si la cache es valida, mostrar sin pedir al servidor
+    string respuesta;
+
     if (cache_perfil_valida)
     {
-        cout << "[cache] " << cache_perfil << endl;
+        respuesta = cache_perfil;
+    }
+    else
+    {
+        string comando_ver = "VER_PERFIL;" + id_socio;
+        socket->enviarMensaje(comando_ver);
+
+        respuesta = socket->recibirMensaje();
+
+        cache_perfil = respuesta;
+        cache_perfil_valida = true;
+    }
+
+    if (respuesta.find("PERFIL_RESP") == string::npos)
+    {
+        cout << respuesta << endl;
         return;
     }
 
-    string comando_ver = "VER_PERFIL;" + id_socio;
-    socket->enviarMensaje(comando_ver);
-    string respuesta = socket->recibirMensaje();
+    vector<string> campos;
+    string campo;
+    stringstream ss(respuesta);
 
-    // Guardar en cache
-    cache_perfil = respuesta;
-    cache_perfil_valida = true;
+    while (getline(ss, campo, ';'))
+    {
+        campos.push_back(campo);
+    }
 
-    cout << respuesta << endl;
+    if (campos.size() >= 6)
+    {
+        cout << "+----------------------+----------------------+\n";
+        cout << "| Campo                | Valor                |\n";
+        cout << "+----------------------+----------------------+\n";
+        cout << "| Usuario              | " << setw(20) << left << campos[2] << " |\n";
+        cout << "| Rol                  | " << setw(20) << left << campos[3] << " |\n";
+        cout << "| Fecha nacimiento     | " << setw(20) << left << campos[4] << " |\n";
+        cout << "| Fecha alta           | " << setw(20) << left << campos[5] << " |\n";
+        cout << "+----------------------+----------------------+\n";
+    }
 }
-
 void MenuCliente::estadoSuscripcion()
 {
-    cout << "\n--- CONSULTAR ESTADO DE LA SUSCRIPCION ---" << endl;
+    cout << "\n=================================================\n";
+    cout << "            ESTADO DE MI SUSCRIPCION\n";
+    cout << "=================================================\n";
 
     if (socket == nullptr)
     {
-        cout << "No hay conexion con el servidor." << endl;
+        cout << "No hay conexion con el servidor.\n";
         return;
     }
 
-    // Si la cache es valida, mostrar sin pedir al servidor
+    string respuesta;
+
     if (cache_suscripcion_valida)
     {
-        cout << "[cache] " << cache_suscripcion << endl;
+        respuesta = cache_suscripcion;
+    }
+    else
+    {
+        string comando = "VER_SUSCRIPCION;" + id_socio;
+        socket->enviarMensaje(comando);
+
+        respuesta = socket->recibirMensaje();
+
+        cache_suscripcion = respuesta;
+        cache_suscripcion_valida = true;
+    }
+
+    if (respuesta.find("SUSCRIPCION_RESP") == string::npos)
+    {
+        cout << respuesta << endl;
         return;
     }
 
-    string comando = "VER_SUSCRIPCION;" + id_socio;
-    socket->enviarMensaje(comando);
-    string respuesta = socket->recibirMensaje();
+    vector<string> campos;
+    string campo;
+    stringstream ss(respuesta);
 
-    // Guardar en cache
-    cache_suscripcion = respuesta;
-    cache_suscripcion_valida = true;
+    while (getline(ss, campo, ';'))
+    {
+        campos.push_back(campo);
+    }
 
-    cout << respuesta << endl;
+    if (campos.size() >= 4)
+    {
+        cout << "+----------------------+----------------------+\n";
+        cout << "| Campo                | Valor                |\n";
+        cout << "+----------------------+----------------------+\n";
+        cout << "| Tipo suscripcion     | " << setw(20) << left << campos[2] << " |\n";
+        cout << "| Precio mensual       | " << setw(17) << left << campos[3] << " EUR |\n";
+        cout << "+----------------------+----------------------+\n";
+    }
 }

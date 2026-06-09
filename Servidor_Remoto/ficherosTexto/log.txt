@@ -105,3 +105,36 @@
 [2026-06-09 20:58:42] [INFO] Peticion recibida: LISTAR_ACTIVIDADES
 [2026-06-09 20:58:57] [INFO] Peticion recibida: VER_PERFIL;3
 [2026-06-09 20:59:11] [INFO] Peticion recibida: VER_SUSCRIPCION;3
+[2026-06-09 21:01:21] [INFO] Cliente desconectado
+[2026-06-09 21:01:26] [INFO] Cliente conectado
+[2026-06-09 21:01:33] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 21:01:33] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 21:01:38] [INFO] Peticion recibida: PERFIL;3
+[2026-06-09 21:01:38] [WARN] ALERTA: Comando desconocido intentado por red: 'PERFIL'
+[2026-06-09 21:01:44] [INFO] Peticion recibida: PERFIL;3
+[2026-06-09 21:01:44] [WARN] ALERTA: Comando desconocido intentado por red: 'PERFIL'
+[2026-06-09 21:02:02] [INFO] Peticion recibida: SUSCRIPCION;3
+[2026-06-09 21:02:02] [WARN] ALERTA: Comando desconocido intentado por red: 'SUSCRIPCION'
+[2026-06-09 21:05:52] [INFO] Cliente desconectado
+[2026-06-09 21:05:58] [INFO] Cliente conectado
+[2026-06-09 21:06:05] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 21:06:05] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 21:06:09] [INFO] Peticion recibida: CONSULTAR_SUSCRIPCION;3
+[2026-06-09 21:06:09] [WARN] ALERTA: Comando desconocido intentado por red: 'CONSULTAR_SUSCRIPCION'
+[2026-06-09 21:06:19] [INFO] Servidor escuchando correctamente.
+[2026-06-09 21:06:23] [INFO] Cliente conectado
+[2026-06-09 21:06:28] [INFO] Peticion recibida: LOGIN;maria_fernada;123456
+[2026-06-09 21:06:28] [WARN] Intento de LOGIN denegado para usuario: 'maria_fernada'.
+[2026-06-09 21:06:28] [INFO] Cliente desconectado
+[2026-06-09 21:07:14] [INFO] Cliente conectado
+[2026-06-09 21:07:23] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 21:07:23] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 21:07:27] [INFO] Peticion recibida: CONSULTAR_PERFIL;3
+[2026-06-09 21:07:27] [WARN] ALERTA: Comando desconocido intentado por red: 'CONSULTAR_PERFIL'
+[2026-06-09 21:10:43] [INFO] Servidor escuchando correctamente.
+[2026-06-09 21:10:50] [INFO] Cliente conectado
+[2026-06-09 21:10:59] [INFO] Peticion recibida: LOGIN;maria_fernanda;123456
+[2026-06-09 21:10:59] [INFO] LOGIN EXITOSO: Socio ID 3 autenticado.
+[2026-06-09 21:11:02] [INFO] Peticion recibida: VER_PERFIL;3
+[2026-06-09 21:11:05] [INFO] Peticion recibida: VER_SUSCRIPCION;3
+[2026-06-09 21:11:10] [INFO] Cliente desconectado
