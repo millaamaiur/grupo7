@@ -112,33 +112,67 @@ void MenuCliente::menuGestionReservas()
     } while (opcion != 5);
 }
 
-void MenuCliente::consultarDisponibilidad()
+void MenuCliente::consultarActividades()
 {
-    int id_instalacion;
-    string fecha, hora;
-
-    cout << "\n--- CONSULTAR DISPONIBILIDAD ---" << endl;
-    cout << "ID instalacion: ";
-    cin >> id_instalacion;
-    cout << "Fecha (YYYY-MM-DD): ";
-    cin >> fecha;
-    cout << "Hora inicio (HH:MM): ";
-    cin >> hora;
+    cout << "\n--- CONSULTAR ACTIVIDADES ---\n";
 
     if (socket == nullptr)
     {
-        cout << "No hay conexion con el servidor." << endl;
+        cout << "No hay conexion con el servidor.\n";
         return;
     }
 
-    string comando = "CONSULTAR_DISPONIBILIDAD;" +
-                     to_string(id_instalacion) + ";" +
-                     fecha + ";" +
-                     hora;
+    socket->enviarMensaje("ACTIVIDADES");
 
-    socket->enviarMensaje(comando);
     string respuesta = socket->recibirMensaje();
-    cout << respuesta << endl;
+
+    if (respuesta.find("ACTIVIDADES_RESP; OK;") == string::npos)
+    {
+        cout << respuesta << endl;
+        return;
+    }
+
+    cout << "+----+----------------------+-----+------+----------+---------------+\n";
+    cout << "| ID | Actividad            | Dia | Hora | Duracion | Participantes |\n";
+    cout << "+----+----------------------+-----+------+----------+---------------+\n";
+
+    string datos = respuesta.substr(respuesta.find("; OK;") + 5);
+
+    size_t inicio = 0;
+
+    while ((inicio = datos.find('[')) != string::npos)
+    {
+        size_t fin = datos.find(']');
+
+        if (fin == string::npos)
+            break;
+
+        string actividad = datos.substr(inicio + 1, fin - inicio - 1);
+
+        vector<string> campos;
+        string campo;
+        stringstream ss(actividad);
+
+        while (getline(ss, campo, ','))
+        {
+            campos.push_back(campo);
+        }
+
+        if (campos.size() >= 6)
+        {
+            cout << "| "
+                 << setw(2) << left << campos[0] << " | "
+                 << setw(20) << left << campos[1] << " | "
+                 << setw(3) << left << campos[2] << " | "
+                 << setw(4) << left << campos[3] << " | "
+                 << setw(8) << left << campos[4] << " | "
+                 << setw(13) << left << campos[5] << " |\n";
+        }
+
+        datos = datos.substr(fin + 1);
+    }
+
+    cout << "+----+----------------------+-----+------+----------+---------------+\n";
 }
 
 void MenuCliente::realizarReserva()
@@ -344,7 +378,9 @@ void MenuCliente::menuActividades()
 
 void MenuCliente::consultarActividades()
 {
-    cout << "\n--- CONSULTAR ACTIVIDADES ---" << endl;
+    cout << "\n===============================================================\n";
+    cout << "                    ACTIVIDADES DISPONIBLES\n";
+    cout << "===============================================================\n";
 
     if (socket == nullptr)
     {
@@ -352,21 +388,74 @@ void MenuCliente::consultarActividades()
         return;
     }
 
-    // Si la cache es valida, mostrar sin pedir al servidor
+    string respuesta;
+
     if (cache_actividades_valida)
     {
-        cout << "[cache] " << cache_actividades << endl;
+        respuesta = cache_actividades;
+        cout << "[Mostrando datos desde cache]\n\n";
+    }
+    else
+    {
+        socket->enviarMensaje("LISTAR_ACTIVIDADES");
+
+        respuesta = socket->recibirMensaje();
+
+        cache_actividades = respuesta;
+        cache_actividades_valida = true;
+    }
+
+    if (respuesta.find("ACTIVIDADES_RESP") == string::npos)
+    {
+        cout << respuesta << endl;
         return;
     }
 
-    socket->enviarMensaje("LISTAR_ACTIVIDADES");
-    string respuesta = socket->recibirMensaje();
+    cout << "+----+----------------------+-----+------+----------+----------------+\n";
+    cout << "| ID | Actividad            | Dia | Hora | Duracion | Participantes  |\n";
+    cout << "+----+----------------------+-----+------+----------+----------------+\n";
 
-    // Guardar en cache
-    cache_actividades = respuesta;
-    cache_actividades_valida = true;
+    size_t pos = respuesta.find(";OK;");
 
-    cout << respuesta << endl;
+    if (pos == string::npos)
+        pos = respuesta.find("; OK;");
+
+    string datos = respuesta.substr(pos + 5);
+
+    while (true)
+    {
+        size_t inicio = datos.find('[');
+        size_t fin = datos.find(']');
+
+        if (inicio == string::npos || fin == string::npos)
+            break;
+
+        string actividad = datos.substr(inicio + 1, fin - inicio - 1);
+
+        vector<string> campos;
+        string campo;
+        stringstream ss(actividad);
+
+        while (getline(ss, campo, ','))
+        {
+            campos.push_back(campo);
+        }
+
+        if (campos.size() >= 6)
+        {
+            cout << "| "
+                 << setw(2)  << left << campos[0] << " | "
+                 << setw(20) << left << campos[1] << " | "
+                 << setw(3)  << left << campos[2] << " | "
+                 << setw(4)  << left << campos[3] << " | "
+                 << setw(8)  << left << campos[4] << " | "
+                 << setw(14) << left << campos[5] << " |\n";
+        }
+
+        datos = datos.substr(fin + 1);
+    }
+
+    cout << "+----+----------------------+-----+------+----------+----------------+\n";
 }
 
 void MenuCliente::registrarseActividad()
@@ -428,7 +517,9 @@ void MenuCliente::menuTaquilla()
 
 void MenuCliente::consultarTaquilla()
 {
-    cout << "\n--- CONSULTAR TAQUILLA ---" << endl;
+    cout << "\n=================================================\n";
+    cout << "                 MI TAQUILLA\n";
+    cout << "=================================================\n";
 
     if (socket == nullptr)
     {
@@ -437,9 +528,53 @@ void MenuCliente::consultarTaquilla()
     }
 
     string comando = "CONSULTAR_TAQUILLA;" + id_socio;
+
     socket->enviarMensaje(comando);
+
     string respuesta = socket->recibirMensaje();
-    cout << respuesta << endl;
+
+    if (respuesta.find("TAQUILLA_RESP;OK;") == string::npos)
+    {
+        cout << respuesta << endl;
+        return;
+    }
+
+    vector<string> campos;
+    string campo;
+    stringstream ss(respuesta);
+
+    while (getline(ss, campo, ';'))
+    {
+        campos.push_back(campo);
+    }
+
+    if (campos.size() >= 7)
+    {
+        cout << "+----------------------+-------------------------+\n";
+        cout << "| Campo                | Valor                   |\n";
+        cout << "+----------------------+-------------------------+\n";
+
+        cout << "| ID Taquilla          | "
+             << setw(23) << left << campos[2] << "|\n";
+
+        cout << "| Ubicacion            | "
+             << setw(23) << left << campos[3] << "|\n";
+
+        cout << "| Hora Inicio          | "
+             << setw(23) << left << campos[4] << "|\n";
+
+        cout << "| Fecha Inicio         | "
+             << setw(23) << left << campos[5] << "|\n";
+
+        cout << "| Estado               | "
+             << setw(23) << left << campos[6] << "|\n";
+
+        cout << "+----------------------+-------------------------+\n";
+    }
+    else
+    {
+        cout << "No se pudo interpretar la informacion de la taquilla.\n";
+    }
 }
 
 void MenuCliente::alquilarTaquilla()
